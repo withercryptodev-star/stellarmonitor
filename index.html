@@ -233,6 +233,33 @@ h1 .hi{color:var(--cyan)}
 
 /* FEATURES */
 .feat-sec{border-top:1px solid var(--bg-edge);padding:64px 40px}
+
+/* MOBILE RESPONSIVE */
+@media(max-width:768px){
+  nav{padding:0 16px}
+  .nav-link{display:none}
+  .hero{padding:80px 16px 40px}
+  .hero-inner{grid-template-columns:1fr;gap:32px}
+  .hero-right{display:none}
+  h1{font-size:clamp(32px,10vw,52px);letter-spacing:-1px}
+  .sec{padding:40px 16px}
+  .feed-lay{grid-template-columns:1fr}
+  .sbar{display:none}
+  .fhdr{grid-template-columns:80px 1fr 90px;font-size:8px}
+  .frow{grid-template-columns:80px 1fr 90px}
+  .ftime{display:none}
+  .scan-in{padding:40px 16px}
+  .rhdr{grid-template-columns:70px 1fr 90px 70px;font-size:8px}
+  .rhdr>div:last-child{display:none}
+  .rrow{grid-template-columns:70px 1fr 90px 70px}
+  .rrow>div:last-child{display:none}
+  .fgrid{grid-template-columns:1fr}
+  .feat-sec{padding:40px 16px}
+  .fin{flex-direction:column;gap:12px;text-align:center}
+  .flinks{flex-wrap:wrap;justify-content:center}
+  .theme-sw{display:none}
+  .depth-control{flex-wrap:wrap;gap:4px;padding:6px 12px}
+}
 .feat-in{max-width:1200px;margin:0 auto}
 .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--bg-edge);border:1px solid var(--bg-edge);border-radius:4px;overflow:hidden}
 .fcard{background:var(--bg-panel);padding:32px 28px}
@@ -479,7 +506,22 @@ const ago=ts=>{const s=Math.floor((Date.now()-new Date(ts))/1000);if(s<60)return
 const pill=(t,c)=>`<span class="pill ${c}">${t}</span>`;
 
 async function fetchPrice(){
-  try{const r=await fetch('https://api.stellar.expert/explorer/public/asset/XLM');const d=await r.json();XLM=parseFloat(d?.price?.USD)||0.174;$('m-price').textContent='$'+XLM.toFixed(4);}catch(e){}
+  try{
+    // CoinGecko — поддерживает CORS
+    const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=stellar&vs_currencies=usd');
+    const d=await r.json();
+    XLM=parseFloat(d?.stellar?.usd)||0.174;
+    $('m-price').textContent='$'+XLM.toFixed(4);
+    $('m-price')?.closest?.('.mbox')?.querySelector?.('.ms') && ($('m-price').closest('.mbox').querySelector('.ms').textContent='CoinGecko');
+  }catch(e){
+    // Фолбек — используем Horizon trade aggregations
+    try{
+      const r2=await fetch('https://horizon.stellar.org/trade_aggregations?base_asset_type=native&counter_asset_type=credit_alphanum4&counter_asset_code=USDC&counter_asset_issuer=GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN&resolution=3600000&limit=1&order=desc');
+      const d2=await r2.json();
+      const price=parseFloat(d2?._embedded?.records?.[0]?.close)||0;
+      if(price>0){XLM=price;$('m-price').textContent='$'+XLM.toFixed(4);}
+    }catch(e2){}
+  }
 }
 
 async function fetchOps(){
