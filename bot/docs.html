@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StellarMonitor — Documentation</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05080d;--dark:#090e16;--panel:#0c1220;--panel2:#0f1628;
+  --edge:rgba(255,255,255,0.07);--edge2:rgba(255,255,255,0.03);
+  --cyan:#00c8ff;--green:#00e87a;--orange:#ff8c00;--red:#ff3d5a;
+  --white:#f0f4fa;--gray1:#8da0b8;--gray2:#4a6380;--gray3:#1e2d40;
+  --mono:'DM Mono',monospace;--sans:'Outfit',sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--gray3)}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(5,8,13,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--edge)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--white);font-weight:700;font-size:15px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+.nav-links{display:flex;gap:8px}
+.nav-link{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gray1);text-decoration:none;padding:6px 14px;border-radius:3px;transition:all .15s}
+.nav-link:hover{color:var(--white)}
+.nav-link.active{color:var(--cyan)}
+
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh;padding-top:56px}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:56px;left:0;width:240px;height:calc(100vh - 56px);overflow-y:auto;border-right:1px solid var(--edge);padding:24px 0;background:var(--dark)}
+.sb-section{margin-bottom:8px}
+.sb-title{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray2);padding:8px 24px;margin-bottom:4px}
+.sb-link{display:block;font-family:var(--mono);font-size:11px;color:var(--gray1);text-decoration:none;padding:7px 24px;transition:all .15s;border-left:2px solid transparent}
+.sb-link:hover{color:var(--white);background:rgba(255,255,255,.03)}
+.sb-link.active{color:var(--cyan);border-left-color:var(--cyan);background:rgba(0,200,255,.05)}
+
+/* CONTENT */
+.content{margin-left:240px;padding:48px 64px;max-width:900px}
+.doc-section{margin-bottom:64px;scroll-margin-top:80px}
+.doc-h1{font-size:32px;font-weight:800;letter-spacing:-.5px;margin-bottom:8px}
+.doc-h2{font-size:20px;font-weight:700;margin-bottom:16px;margin-top:40px;padding-top:40px;border-top:1px solid var(--edge)}
+.doc-h3{font-size:15px;font-weight:600;margin-bottom:10px;margin-top:24px;color:var(--cyan)}
+.doc-tag{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:2px;margin-bottom:16px}
+.doc-tag.v{background:rgba(0,232,122,.1);color:var(--green)}
+.doc-tag.info{background:rgba(0,200,255,.1);color:var(--cyan)}
+p{font-size:14px;line-height:1.8;color:var(--gray1);margin-bottom:16px}
+p a{color:var(--cyan);text-decoration:none}p a:hover{text-decoration:underline}
+ul,ol{padding-left:20px;margin-bottom:16px}
+li{font-size:14px;line-height:1.8;color:var(--gray1);margin-bottom:4px}
+code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.06);padding:2px 8px;border-radius:3px;color:var(--white)}
+pre{background:var(--panel);border:1px solid var(--edge);border-radius:4px;padding:20px 24px;margin-bottom:20px;overflow-x:auto}
+pre code{background:none;padding:0;font-size:12px;line-height:1.7;color:#a8d8ea}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;margin-bottom:24px;font-size:13px}
+th{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray2);padding:10px 16px;text-align:left;border-bottom:1px solid var(--edge)}
+td{padding:10px 16px;border-bottom:1px solid var(--edge2);color:var(--gray1);vertical-align:top}
+td:first-child{font-family:var(--mono);font-size:12px;color:var(--cyan)}
+tr:last-child td{border-bottom:none}
+
+/* CALLOUT */
+.callout{background:rgba(0,200,255,.05);border:1px solid rgba(0,200,255,.2);border-radius:4px;padding:14px 18px;margin-bottom:20px;font-size:13px;color:var(--gray1)}
+.callout.warn{background:rgba(255,149,0,.05);border-color:rgba(255,149,0,.25)}
+.callout strong{color:var(--white)}
+
+/* METHOD BADGE */
+.method{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;padding:2px 8px;border-radius:2px;margin-right:8px}
+.get{background:rgba(0,232,122,.15);color:var(--green)}
+.post{background:rgba(0,200,255,.15);color:var(--cyan)}
+
+@media(max-width:768px){.sidebar{display:none}.layout{grid-template-columns:1fr}.content{margin-left:0;padding:32px 20px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo"><div class="logo-dot"></div>StellarMonitor</a>
+  <div class="nav-links">
+    <a href="feed.html"    class="nav-link">Live Feed</a>
+    <a href="scanner.html" class="nav-link">Scanner</a>
+    <a href="graph.html"   class="nav-link">Graph</a>
+    <a href="docs.html"    class="nav-link active">Docs</a>
+  </div>
+  <a href="https://x.com/StellarMonitor" style="font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:7px 18px;border:1px solid var(--edge);color:var(--gray1);border-radius:3px;text-decoration:none" target="_blank">Follow ↗</a>
+</nav>
+
+<div class="layout">
+<aside class="sidebar">
+  <div class="sb-section">
+    <div class="sb-title">Overview</div>
+    <a href="#intro"       class="sb-link active">Introduction</a>
+    <a href="#architecture" class="sb-link">Architecture</a>
+    <a href="#data-sources" class="sb-link">Data Sources</a>
+  </div>
+  <div class="sb-section">
+    <div class="sb-title">Features</div>
+    <a href="#whale"    class="sb-link">Whale Alerts</a>
+    <a href="#sdex"     class="sb-link">SDEX Monitor</a>
+    <a href="#soroban"  class="sb-link">Soroban Events</a>
+    <a href="#scanner"  class="sb-link">Transaction Scanner</a>
+    <a href="#graph"    class="sb-link">Wallet Graph</a>
+  </div>
+  <div class="sb-section">
+    <div class="sb-title">API Reference</div>
+    <a href="#api-overview" class="sb-link">Overview</a>
+    <a href="#api-alerts"   class="sb-link">GET /api/alerts</a>
+    <a href="#api-stats"    class="sb-link">GET /api/stats</a>
+    <a href="#api-whale"    class="sb-link">GET /api/whale</a>
+    <a href="#api-pairs"    class="sb-link">GET /api/pairs</a>
+  </div>
+  <div class="sb-section">
+    <div class="sb-title">Legal</div>
+    <a href="#disclaimer"  class="sb-link">Disclaimer</a>
+    <a href="#privacy"     class="sb-link">Privacy Policy</a>
+    <a href="#tos"         class="sb-link">Terms of Service</a>
+    <a href="#licenses"    class="sb-link">Open Source Licenses</a>
+  </div>
+</aside>
+
+<main class="content">
+
+<!-- INTRO -->
+<div class="doc-section" id="intro">
+  <div class="doc-h1">Documentation</div>
+  <div class="doc-tag v">v1.0</div>
+  <p>StellarMonitor is a real-time on-chain intelligence platform for the Stellar Network. It monitors whale transfers, large SDEX trades, Soroban smart contract events, and anomalous token distribution patterns — delivering instant alerts via Twitter, Telegram, and this web dashboard.</p>
+  <p>All data is sourced directly from public blockchain infrastructure. StellarMonitor does not store private keys, personal data, or any information that could identify individual users.</p>
+  <div class="callout"><strong>Open Source.</strong> The StellarMonitor bot and site are published under the MIT License at <a href="https://github.com/withercryptodev-star/stellarmonitor" target="_blank">github.com/withercryptodev-star/stellarmonitor</a>.</div>
+</div>
+
+<!-- ARCHITECTURE -->
+<div class="doc-section" id="architecture">
+  <div class="doc-h2">Architecture</div>
+  <p>StellarMonitor consists of three components running independently:</p>
+  <table>
+    <tr><th>Component</th><th>Description</th><th>Technology</th></tr>
+    <tr><td>Bot</td><td>Core monitoring engine. Subscribes to Horizon SSE stream, detects patterns, publishes alerts</td><td>Python 3.11, Tweepy, python-telegram-bot</td></tr>
+    <tr><td>API</td><td>REST API serving alert history and statistics to the website</td><td>FastAPI, SQLite, Uvicorn</td></tr>
+    <tr><td>Site</td><td>Public dashboard and tools. Reads from Horizon API directly and from the StellarMonitor API</td><td>Vanilla HTML/CSS/JS, hosted on GitHub Pages</td></tr>
+  </table>
+  <div class="doc-h3">Data Flow</div>
+  <pre><code>Stellar Network
+      │
+      ▼
+Horizon SSE Stream (/operations)
+      │
+      ▼
+StellarMonitor Bot
+  ├── Whale detector
+  ├── SDEX detector
+  ├── Soroban monitor
+  └── Meme pump detector
+      │
+      ├──▶ Twitter / X
+      ├──▶ Telegram
+      └──▶ SQLite DB ──▶ FastAPI ──▶ stellarmonitor.xyz</code></pre>
+</div>
+
+<!-- DATA SOURCES -->
+<div class="doc-section" id="data-sources">
+  <div class="doc-h2">Data Sources</div>
+  <p>StellarMonitor uses exclusively <strong>public</strong> blockchain data. No proprietary or private data sources are used.</p>
+  <table>
+    <tr><th>Source</th><th>Usage</th><th>Documentation</th></tr>
+    <tr><td>Stellar Horizon API</td><td>Primary data source. SSE stream for real-time operations, REST for historical queries</td><td><a href="https://developers.stellar.org/docs/data/horizon" target="_blank">developers.stellar.org</a></td></tr>
+    <tr><td>Soroban RPC</td><td>Smart contract events from Soroban-enabled protocols (Aquarius, Soroswap, Blend)</td><td><a href="https://developers.stellar.org/docs/data/rpc" target="_blank">developers.stellar.org/rpc</a></td></tr>
+    <tr><td>stellar.expert API</td><td>Token metadata and asset information</td><td><a href="https://stellar.expert" target="_blank">stellar.expert</a></td></tr>
+    <tr><td>CoinGecko API</td><td>XLM price in USD (free tier, no API key required)</td><td><a href="https://www.coingecko.com/en/api" target="_blank">coingecko.com/api</a></td></tr>
+    <tr><td>Twitter API v2</td><td>Publishing whale alerts to @StellarMonitor</td><td><a href="https://developer.twitter.com/en/docs" target="_blank">developer.twitter.com</a></td></tr>
+    <tr><td>Telegram Bot API</td><td>Publishing alerts to @stellarmonitor channel</td><td><a href="https://core.telegram.org/bots/api" target="_blank">core.telegram.org/bots/api</a></td></tr>
+  </table>
+</div>
+
+<!-- WHALE -->
+<div class="doc-section" id="whale">
+  <div class="doc-h2">Whale Alerts</div>
+  <p>The whale detector monitors all <code>payment</code> operations on the Stellar network in real time via Horizon Server-Sent Events (SSE). An alert is triggered when a single transfer exceeds configurable USD thresholds.</p>
+  <div class="doc-h3">Alert Intensity Scale</div>
+  <table>
+    <tr><th>Emoji</th><th>Label</th><th>Threshold</th></tr>
+    <tr><td><code>🔵</code></td><td>Alert</td><td>Below $250K</td></tr>
+    <tr><td><code>🟡🟡</code></td><td>Notable</td><td>$250K – $1M</td></tr>
+    <tr><td><code>🟠🟠🟠</code></td><td>Big Move</td><td>$1M – $10M</td></tr>
+    <tr><td><code>🔴×4</code></td><td>Whale</td><td>$10M – $50M</td></tr>
+    <tr><td><code>🚨×5</code></td><td>Historic</td><td>$50M+</td></tr>
+  </table>
+  <div class="doc-h3">Mass Distribution Detection</div>
+  <p>When one sender transfers identical amounts to multiple wallets within a short window, StellarMonitor groups these into a single "Mass Distribution" alert. This pattern typically indicates payroll, airdrop, or institutional liquidity provisioning.</p>
+</div>
+
+<!-- SDEX -->
+<div class="doc-section" id="sdex">
+  <div class="doc-h2">SDEX Monitor</div>
+  <p>Stellar's built-in decentralized exchange (SDEX) is monitored by tracking <code>manage_sell_offer</code>, <code>manage_buy_offer</code>, and <code>path_payment</code> operations. Multi-operation transactions are grouped into a single alert showing all pairs and total volume.</p>
+  <div class="doc-h3">Volume Spike Detection</div>
+  <p>The system tracks a rolling 60-minute average for each SDEX pair. When the volume in a 10-minute window exceeds 3× the average, a Volume Spike alert is published.</p>
+</div>
+
+<!-- SOROBAN -->
+<div class="doc-section" id="soroban">
+  <div class="doc-h2">Soroban Events</div>
+  <p>StellarMonitor is the first public tool providing real-time monitoring of Soroban smart contract events on Stellar mainnet. It connects to a Soroban RPC endpoint and polls for contract events from known DeFi protocols.</p>
+  <div class="doc-h3">Tracked Protocols</div>
+  <table>
+    <tr><th>Protocol</th><th>Events Tracked</th></tr>
+    <tr><td>Aquarius AMM</td><td>Liquidity Deposit, Liquidity Withdraw, Swap, New Pool</td></tr>
+    <tr><td>Soroswap</td><td>Swap, Add Liquidity, Remove Liquidity</td></tr>
+    <tr><td>Blend Protocol</td><td>Supply, Borrow, Repay, Liquidation</td></tr>
+  </table>
+  <div class="callout warn"><strong>Note:</strong> Soroban RPC does not always return USD amounts for liquidity events. In such cases, the event is either skipped or published with the contract name only.</div>
+</div>
+
+<!-- SCANNER -->
+<div class="doc-section" id="scanner">
+  <div class="doc-h2">Transaction Scanner</div>
+  <p>The Scanner tool allows exploring the full transaction history of any Stellar wallet address. It queries the Horizon API and supports multi-page pagination to load data across arbitrary time periods.</p>
+  <div class="doc-h3">Filter Options</div>
+  <table>
+    <tr><th>Filter</th><th>Description</th></tr>
+    <tr><td>Type</td><td>All / Transfers / SDEX / Path Payment</td></tr>
+    <tr><td>Min Value</td><td>Minimum USD value threshold ($10K to $10M+)</td></tr>
+    <tr><td>Asset</td><td>Filter by specific asset: XLM, USDC, USDT, or custom token</td></tr>
+    <tr><td>Sort</td><td>Newest first or Largest first</td></tr>
+    <tr><td>Period</td><td>1h, 24h, 3d, 7d, 2w, 30d, 1y, All time</td></tr>
+    <tr><td>Exchange Flows</td><td>Only show transactions involving known exchanges</td></tr>
+    <tr><td>Circular</td><td>Detect A→B→A round-trip patterns</td></tr>
+    <tr><td>Round Numbers</td><td>Filter for institutionally round amounts ($50K, $100K, etc.)</td></tr>
+    <tr><td>Repeated Amounts</td><td>Highlight recurring transfer amounts (payroll/airdrop patterns)</td></tr>
+  </table>
+  <div class="callout"><strong>Rate Limits.</strong> The Scanner uses Horizon public API with a 100ms delay between pages. For periods longer than 7 days on active wallets, loading may take 1-3 minutes.</div>
+</div>
+
+<!-- GRAPH -->
+<div class="doc-section" id="graph">
+  <div class="doc-h2">Wallet Graph</div>
+  <p>The Graph tool visualizes transaction connections between wallets as an interactive force-directed node graph. Node size corresponds to transaction volume; color indicates direction of fund flow.</p>
+  <div class="doc-h3">Color Legend</div>
+  <table>
+    <tr><th>Color</th><th>Meaning</th></tr>
+    <tr><td><code style="background:rgba(0,200,255,.15);color:#00c8ff">Cyan</code></td><td>Root wallet (the address you searched)</td></tr>
+    <tr><td><code style="background:rgba(0,232,122,.15);color:#00e87a">Green</code></td><td>Wallets that received funds from root</td></tr>
+    <tr><td><code style="background:rgba(255,140,0,.15);color:#ff8c00">Orange</code></td><td>Wallets that sent funds to root</td></tr>
+    <tr><td><code style="background:rgba(192,132,252,.15);color:#c084fc">Purple</code></td><td>Wallets with bidirectional transfers</td></tr>
+    <tr><td><code style="background:rgba(100,116,139,.15);color:#94a3b8">Gray</code></td><td>Known exchanges (Binance, Coinbase, etc.)</td></tr>
+  </table>
+  <p>Double-click any node to re-center the graph on that wallet. Use the depth selector (1/2/3) to control how many hops away from the root are explored.</p>
+</div>
+
+<!-- API OVERVIEW -->
+<div class="doc-section" id="api-overview">
+  <div class="doc-h2">API Reference</div>
+  <div class="callout warn"><strong>Status:</strong> The StellarMonitor REST API is currently available only when the bot is running on a VPS. At this time the site reads data directly from Horizon. The API endpoints below will be available at <code>https://api.stellarmonitor.xyz</code> after VPS deployment.</div>
+  <p>Base URL: <code>https://api.stellarmonitor.xyz</code></p>
+  <p>All endpoints return JSON. No authentication required. CORS is enabled for all origins.</p>
+</div>
+
+<!-- API ALERTS -->
+<div class="doc-section" id="api-alerts">
+  <div class="doc-h3"><span class="method get">GET</span>/api/alerts</div>
+  <p>Returns the most recent whale and SDEX alerts detected by the bot.</p>
+  <pre><code>GET /api/alerts?limit=50&min_usd=100000
+
+Response:
+{
+  "alerts": [
+    {
+      "id": 142,
+      "type": "WHALE_USDC",
+      "usd_value": 2500000,
+      "asset": "USDC",
+      "amount": 2500000,
+      "from_full": "GAVA7FY3...",
+      "to_full": "GDDZ...",
+      "link": "https://stellar.expert/explorer/public/tx/...",
+      "created_at": "2026-03-21T10:30:00Z"
+    }
+  ],
+  "count": 1
+}</code></pre>
+  <table>
+    <tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
+    <tr><td>limit</td><td>integer</td><td>50</td><td>Number of results (max 200)</td></tr>
+    <tr><td>type</td><td>string</td><td>—</td><td>Filter by alert type: WHALE_USDC, WHALE_XLM, SDEX, AIRDROP_SUMMARY</td></tr>
+    <tr><td>min_usd</td><td>float</td><td>0</td><td>Minimum USD value</td></tr>
+  </table>
+</div>
+
+<!-- API STATS -->
+<div class="doc-section" id="api-stats">
+  <div class="doc-h3"><span class="method get">GET</span>/api/stats</div>
+  <p>Returns aggregated statistics for the last 24 hours.</p>
+  <pre><code>GET /api/stats
+
+Response:
+{
+  "period": "24h",
+  "total_alerts": 47,
+  "whale_count": 12,
+  "sdex_count": 31,
+  "mass_count": 3,
+  "meme_count": 1,
+  "biggest_usd": 610000000,
+  "usdc_volume": 48500000
+}</code></pre>
+</div>
+
+<!-- API WHALE -->
+<div class="doc-section" id="api-whale">
+  <div class="doc-h3"><span class="method get">GET</span>/api/whale</div>
+  <p>Returns only whale-type alerts above a specified threshold.</p>
+  <pre><code>GET /api/whale?min_usd=500000&limit=20</code></pre>
+  <table>
+    <tr><th>Parameter</th><th>Type</th><th>Default</th></tr>
+    <tr><td>min_usd</td><td>float</td><td>100000</td></tr>
+    <tr><td>limit</td><td>integer</td><td>20</td></tr>
+  </table>
+</div>
+
+<!-- API PAIRS -->
+<div class="doc-section" id="api-pairs">
+  <div class="doc-h3"><span class="method get">GET</span>/api/pairs</div>
+  <p>Returns top SDEX trading pairs by volume in the last 24 hours.</p>
+  <pre><code>GET /api/pairs?limit=5
+
+Response:
+{
+  "pairs": [
+    { "pair": "USDC/AQUA", "cnt": 14, "vol": 6020000 },
+    { "pair": "USDC/CETES", "cnt": 8, "vol": 3470000 }
+  ]
+}</code></pre>
+</div>
+
+<!-- DISCLAIMER -->
+<div class="doc-section" id="disclaimer">
+  <div class="doc-h2">Disclaimer</div>
+  <p>StellarMonitor is an <strong>informational tool only</strong>. It displays publicly available on-chain data for educational and analytical purposes.</p>
+  <ul>
+    <li>StellarMonitor does <strong>not</strong> provide financial, investment, trading, or legal advice.</li>
+    <li>Nothing on this platform constitutes a recommendation to buy, sell, or hold any cryptocurrency or digital asset.</li>
+    <li>All blockchain data displayed is sourced from public APIs and is provided "as is" without warranty of accuracy or completeness.</li>
+    <li>Past transaction patterns do not indicate future activity or price movements.</li>
+    <li>StellarMonitor is not affiliated with the Stellar Development Foundation, Circle, or any other entity whose addresses may appear in alerts.</li>
+    <li>Use this tool at your own risk. The operators of StellarMonitor accept no liability for any decisions made based on information displayed here.</li>
+  </ul>
+</div>
+
+<!-- PRIVACY -->
+<div class="doc-section" id="privacy">
+  <div class="doc-h2">Privacy Policy</div>
+  <p><strong>Last updated: March 21, 2026</strong></p>
+  <div class="doc-h3">Data We Collect</div>
+  <p>StellarMonitor does <strong>not</strong> collect, store, or process any personally identifiable information (PII). Specifically:</p>
+  <ul>
+    <li>We do not use cookies or tracking pixels.</li>
+    <li>We do not require registration or login.</li>
+    <li>We do not store IP addresses or browser fingerprints.</li>
+    <li>Wallet addresses entered in the Scanner are not logged or stored.</li>
+  </ul>
+  <div class="doc-h3">On-Chain Data</div>
+  <p>All data displayed by StellarMonitor is sourced from the public Stellar blockchain. Blockchain data is inherently public and permanent. StellarMonitor does not make any previously private data public — it only presents what is already visible on-chain.</p>
+  <div class="doc-h3">Third-Party Services</div>
+  <p>This site uses Google Fonts (served from fonts.googleapis.com) for typography. Please refer to <a href="https://policies.google.com/privacy" target="_blank">Google's Privacy Policy</a> for details on their data handling. No other third-party analytics or tracking services are used.</p>
+  <div class="doc-h3">Contact</div>
+  <p>For privacy-related inquiries, contact us via <a href="https://x.com/StellarMonitor" target="_blank">Twitter @StellarMonitor</a>.</p>
+</div>
+
+<!-- TERMS -->
+<div class="doc-section" id="tos">
+  <div class="doc-h2">Terms of Service</div>
+  <p><strong>Last updated: March 21, 2026</strong></p>
+  <p>By accessing stellarmonitor.xyz ("the Site"), you agree to the following terms:</p>
+  <div class="doc-h3">Permitted Use</div>
+  <ul>
+    <li>You may use the Site for personal, educational, and non-commercial research purposes.</li>
+    <li>You may access the public API for non-commercial projects with attribution.</li>
+    <li>You may share links to the Site and its content with attribution.</li>
+  </ul>
+  <div class="doc-h3">Prohibited Use</div>
+  <ul>
+    <li>You may not use automated scraping tools to excessively query the Site or API in ways that degrade service for others.</li>
+    <li>You may not use data from this Site to harass, dox, or harm any individual or entity.</li>
+    <li>You may not represent StellarMonitor data as your own original research without attribution.</li>
+  </ul>
+  <div class="doc-h3">Availability</div>
+  <p>The Site is provided on a best-effort basis. We do not guarantee 100% uptime or real-time accuracy of displayed data. Blockchain data may be delayed by Horizon API latency.</p>
+  <div class="doc-h3">Changes</div>
+  <p>We reserve the right to modify these terms at any time. Continued use of the Site constitutes acceptance of updated terms.</p>
+</div>
+
+<!-- LICENSES -->
+<div class="doc-section" id="licenses">
+  <div class="doc-h2">Open Source Licenses</div>
+  <p>StellarMonitor is released under the <strong>MIT License</strong>.</p>
+  <pre><code>MIT License
+
+Copyright (c) 2026 StellarMonitor Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.</code></pre>
+
+  <div class="doc-h3">Third-Party Dependencies</div>
+  <table>
+    <tr><th>Package</th><th>License</th><th>Usage</th></tr>
+    <tr><td>requests</td><td>Apache 2.0</td><td>HTTP client for Horizon API</td></tr>
+    <tr><td>httpx</td><td>BSD 3-Clause</td><td>Async HTTP for Soroban RPC</td></tr>
+    <tr><td>tweepy</td><td>MIT</td><td>Twitter API v2 client</td></tr>
+    <tr><td>python-telegram-bot</td><td>LGPL 3.0</td><td>Telegram Bot API client</td></tr>
+    <tr><td>python-dotenv</td><td>BSD 3-Clause</td><td>Environment variable loading</td></tr>
+    <tr><td>stellar-sdk</td><td>Apache 2.0</td><td>Stellar network utilities</td></tr>
+    <tr><td>fastapi</td><td>MIT</td><td>REST API framework</td></tr>
+    <tr><td>uvicorn</td><td>BSD 3-Clause</td><td>ASGI server for FastAPI</td></tr>
+    <tr><td>DM Mono (font)</td><td>SIL OFL 1.1</td><td>Monospace typography</td></tr>
+    <tr><td>Outfit (font)</td><td>SIL OFL 1.1</td><td>Display typography</td></tr>
+  </table>
+</div>
+
+</main>
+</div>
+
+<script>
+// Sidebar active link on scroll
+const sections = document.querySelectorAll('.doc-section');
+const links    = document.querySelectorAll('.sb-link');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if(window.scrollY >= s.offsetTop - 100) current = s.id; });
+  links.forEach(l => {
+    l.classList.toggle('active', l.getAttribute('href') === '#'+current);
+  });
+});
+</script>
+</body>
+</html>
