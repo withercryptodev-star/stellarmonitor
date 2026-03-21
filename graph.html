@@ -692,9 +692,9 @@ async function loadGraph() {
   try {
     // Fetch XLM price
     try {
-      const pr=await fetch('https://api.stellar.expert/explorer/public/asset/XLM');
+      const pr=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=stellar&vs_currencies=usd');
       const pd=await pr.json();
-      XLM_PRICE=parseFloat(pd?.price?.USD)||0.174;
+      XLM_PRICE=parseFloat(pd?.stellar?.usd)||0.174;
     } catch(e){}
 
     const result = await buildGraph(addr, depth);
