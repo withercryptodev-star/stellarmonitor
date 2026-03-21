@@ -287,7 +287,6 @@ footer{border-top:1px solid var(--bg-edge);padding:24px 40px}
     <a href="#feed" class="nav-link">Feed</a>
     <a href="#scanner" class="nav-link">Scanner</a>
     <a href="graph.html" class="nav-link">Graph</a>
-    <a href="https://t.me/stellarmonitor" class="nav-link" target="_blank">Telegram</a>
     <div class="theme-sw" title="Switch theme">
       <button class="theme-btn active" id="tb-dark"   onclick="setTheme('dark')"     title="Dark">🌑</button>
       <button class="theme-btn"        id="tb-light"  onclick="setTheme('light')"    title="Light">☀️</button>
@@ -416,14 +415,17 @@ footer{border-top:1px solid var(--bg-edge);padding:24px 40px}
       </div>
     </div>
 
-    <!-- Row 4: Sort + Time + Extra -->
+    <!-- Row 4: Sort -->
     <div class="fp-row">
       <div class="fp-label">Sort by</div>
       <div class="fp-chips" id="fc-sort">
         <div class="chip on"  onclick="setFilter('sort',this,'time')">Newest</div>
         <div class="chip"     onclick="setFilter('sort',this,'usd')">Largest</div>
       </div>
-      <div class="fp-sep"></div>
+    </div>
+
+    <!-- Row 5: Period -->
+    <div class="fp-row">
       <div class="fp-label">Period</div>
       <div class="fp-chips" id="fc-period">
         <div class="chip on"  onclick="setPeriod(this,1,'Last 1h')">1h</div>
@@ -583,8 +585,9 @@ async function fetchOps(){
     const existing=feed.filter(e=>!items.find(i=>i.hash===e.hash));
     feed=[...items,...existing].slice(0,50);
 
+    const biggestVal = feed.length ? Math.max(...feed.map(f=>f.usd)) : 0;
     $('m-alerts').textContent=feed.length;
-    $('m-biggest').textContent=fU(Math.max(...feed.map(f=>f.usd)));
+    $('m-biggest').textContent=biggestVal>0?fU(biggestVal):'—';
     $('m-usdc').textContent=fN(usdcVol);
     $('upd').textContent=new Date().toLocaleTimeString('en',{hour12:false});
     renderFeed();renderBars();
