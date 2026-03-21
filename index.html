@@ -526,34 +526,69 @@ async function fetchPrice(){
 
 async function fetchOps(){
   try{
-    const r=await fetch(`${H}/operations?limit=200&order=desc&include_failed=false`);
-    const d=await r.json();const ops=d?._embedded?.records||[];
-    let alerts=0,biggest=0,usdcVol=0;ic={1:0,2:0,3:0,4:0};const items=[];
-    ops.forEach(op=>{
+    // Загружаем 3 страницы по 200 операций = 600 операций
+    // Это даёт больше шансов найти крупные транзакции
+    let allOps=[], cursor=null;
+    for(let p=0;p<3;p++){
+      const url=cursor
+        ?`${H}/payments?limit=200&order=desc&include_failed=false&cursor=${cursor}`
+        :`${H}/payments?limit=200&order=desc&include_failed=false`;
+      const r=await fetch(url);
+      if(!r.ok) break;
+      const d=await r.json();
+      const batch=d?._embedded?.records||[];
+      if(!batch.length) break;
+      allOps.push(...batch);
+      // Стоп если последняя запись старше 2 часов
+      const oldest=new Date(batch[batch.length-1].created_at);
+      if(Date.now()-oldest.getTime()>7200000) break;
+      const next=d?._links?.next?.href;
+      if(!next) break;
+      const m=next.match(/cursor=([^&]+)/);
+      cursor=m?m[1]:null;
+      if(!cursor||p<2) await new Promise(r=>setTimeout(r,150));
+    }
+
+    let alerts=0,biggest=0,usdcVol=0;
+    ic={1:0,2:0,3:0,4:0};
+    const items=[];
+    const seen=new Set();
+
+    allOps.forEach(op=>{
+      const hash=op.transaction_hash||op.id;
+      if(seen.has(hash)) return;
+      seen.add(hash);
+
       if(op.type==='payment'){
         const amt=parseFloat(op.amount||0);
         const code=op.asset_type==='native'?'XLM':(op.asset_code||'?');
         let usd=code==='XLM'?amt*XLM:(code==='USDC'||code==='USDT'?amt:0);
-        if(!usd||usd<50000)return;
+        // Снижаем порог до $10K чтобы больше транзакций показывалось
+        if(!usd||usd<10000)return;
         if(code==='USDC'||code==='USDT')usdcVol+=amt;
         alerts++;if(usd>biggest)biggest=usd;
         if(usd>=10e6)ic[4]++;else if(usd>=1e6)ic[3]++;else if(usd>=250000)ic[2]++;else ic[1]++;
         items.push({tp:'WHALE',tc:'pw',desc:`${fN(amt)} ${code}`,sub:`${op.from?.slice(0,6)}...${op.from?.slice(-4)} → ${op.to?.slice(0,6)}...${op.to?.slice(-4)}`,usd,ts:op.created_at,hash:op.transaction_hash});
-      }else if(op.type==='manage_sell_offer'||op.type==='manage_buy_offer'){
-        const amt=parseFloat(op.amount||0);
-        const sell=op.selling_asset_type==='native'?'XLM':(op.selling_asset_code||'?');
-        const buy=op.buying_asset_type==='native'?'XLM':(op.buying_asset_code||'?');
-        let usd=sell==='XLM'?amt*XLM:(sell==='USDC'||sell==='USDT'?amt:0);
-        if(!usd||usd<75000)return;
-        alerts++;if(usd>biggest)biggest=usd;
-        if(usd>=10e6)ic[4]++;else if(usd>=1e6)ic[3]++;else if(usd>=250000)ic[2]++;else ic[1]++;
-        items.push({tp:'SDEX',tc:'ps',desc:`${sell} → ${buy}`,sub:`${fN(amt)} ${sell}`,usd,ts:op.created_at,hash:op.transaction_hash});
       }
     });
-    items.sort((a,b)=>new Date(b.ts)-new Date(a.ts));feed=items.slice(0,30);
-    $('m-alerts').textContent=alerts;$('m-biggest').textContent=fU(biggest);$('m-usdc').textContent=fN(usdcVol);$('upd').textContent=new Date().toLocaleTimeString('en',{hour12:false});
+
+    if(items.length===0 && feed.length>0){
+      // Нет новых данных — обновляем только время
+      $('upd').textContent=new Date().toLocaleTimeString('en',{hour12:false});
+      return;
+    }
+
+    items.sort((a,b)=>new Date(b.ts)-new Date(a.ts));
+    // Мержим с существующим фидом чтобы не терять данные
+    const existing=feed.filter(e=>!items.find(i=>i.hash===e.hash));
+    feed=[...items,...existing].slice(0,50);
+
+    $('m-alerts').textContent=feed.length;
+    $('m-biggest').textContent=fU(Math.max(...feed.map(f=>f.usd)));
+    $('m-usdc').textContent=fN(usdcVol);
+    $('upd').textContent=new Date().toLocaleTimeString('en',{hour12:false});
     renderFeed();renderBars();
-  }catch(e){console.warn(e);}
+  }catch(e){console.warn('fetchOps error:',e);}
 }
 
 function renderFeed(){
