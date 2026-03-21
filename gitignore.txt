@@ -1,0 +1,7 @@
+settings.env
+*.db
+*.log
+*.json
+__pycache__/
+*.pyc
+.env
