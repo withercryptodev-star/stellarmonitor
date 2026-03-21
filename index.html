@@ -564,13 +564,20 @@ async function fetchOps(){
       if(op.type==='payment'){
         const amt=parseFloat(op.amount||0);
         const code=op.asset_type==='native'?'XLM':(op.asset_code||'?');
-        let usd=code==='XLM'?amt*XLM:(code==='USDC'||code==='USDT'?amt:0);
-        // Снижаем порог до $10K чтобы больше транзакций показывалось
-        if(!usd||usd<10000)return;
+        // Считаем USD стоимость
+        let usd=code==='XLM'?amt*XLM:(['USDC','USDT'].includes(code)?amt:amt*0.001);
+        // Показываем всё от $1 — будем накапливать
+        if(!amt||amt<0.01)return;
         if(code==='USDC'||code==='USDT')usdcVol+=amt;
         alerts++;if(usd>biggest)biggest=usd;
         if(usd>=10e6)ic[4]++;else if(usd>=1e6)ic[3]++;else if(usd>=250000)ic[2]++;else ic[1]++;
-        items.push({tp:'WHALE',tc:'pw',desc:`${fN(amt)} ${code}`,sub:`${op.from?.slice(0,6)}...${op.from?.slice(-4)} → ${op.to?.slice(0,6)}...${op.to?.slice(-4)}`,usd,ts:op.created_at,hash:op.transaction_hash});
+        const amtFmt=amt>=1e6?fN(amt)+' '+code:amt>=1000?fN(amt)+' '+code:amt.toFixed(2)+' '+code;
+        items.push({
+          tp:'WHALE',tc:'pw',
+          desc:amtFmt,
+          sub:`${op.from?.slice(0,6)}...${op.from?.slice(-4)} → ${op.to?.slice(0,6)}...${op.to?.slice(-4)}`,
+          usd,ts:op.created_at,hash:op.transaction_hash
+        });
       }
     });
 
