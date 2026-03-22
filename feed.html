@@ -169,7 +169,7 @@ async function fetchFromAPI(){
 
     // Фильтруем за последние 24 часа
     const cutoff=Date.now()-86400000;
-    const today=alerts.filter(a=>new Date(a.created_at).getTime()>cutoff);
+    const today=alerts.filter(a=>new Date(a.created_at.replace(' ','T')+'Z').getTime()>cutoff);
 
     const items=today.map(a=>{
       const code=a.asset||a.selling||'XLM';
@@ -181,7 +181,7 @@ async function fetchFromAPI(){
       const sub=from?`${from.slice(0,6)}...${from.slice(-4)} → ${to?(to.slice(0,6)+'...'+to.slice(-4)):'?'}`:(a.pair||'');
       const tp=a.type==='SDEX'?'SDEX':a.type?.includes('AIRDROP')?'AIRDROP':'WHALE';
       const tc=tp==='WHALE'?'pw':tp==='SDEX'?'ps':'pm';
-      return{tp,tc,desc:disp,sub,usd,ts:a.created_at,hash:a.tx_hash||'',link:a.link||''};
+      return{tp,tc,desc:disp,sub,usd,ts:a.created_at.replace(' ','T')+'Z',hash:a.tx_hash||'',link:a.link||''};
     });
 
     items.sort((a,b)=>new Date(b.ts)-new Date(a.ts));
