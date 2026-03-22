@@ -76,10 +76,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
 <nav>
   <a href="/" class="logo"><div class="logo-dot"></div>StellarMonitor</a>
   <div class="nav-center">
-    <a href="/feed"    class="nav-link active">Live Feed</a>
-    <a href="/scanner" class="nav-link">Scanner</a>
-    <a href="/graph"   class="nav-link">Graph</a>
-    <a href="/docs"    class="nav-link">Docs</a>
+    <a href="/feed.html"    class="nav-link active">Live Feed</a>
+    <a href="/scanner.html" class="nav-link">Scanner</a>
+    <a href="/graph.html"   class="nav-link">Graph</a>
+    <a href="/docs.html"    class="nav-link">Docs</a>
   </div>
   <a href="https://x.com/StellarMonitor" class="nav-cta" target="_blank">Follow ↗</a>
 </nav>
@@ -193,7 +193,11 @@ async function fetchFromAPI(){
 
     today.forEach(a=>{
       const usd=a.usd_value||0;
-      if((a.asset==='USDC'||a.selling==='USDC')&&a.amount) usdc24+=a.amount;
+      // Count USDC volume from all alert types
+      if(a.asset==='USDC'&&a.amount) usdc24+=a.amount;
+      else if(a.selling==='USDC'&&a.amount) usdc24+=a.amount;
+      else if(a.type==='AIRDROP_SUMMARY'&&a.total_usd) usdc24+=a.total_usd;
+      else if(a.type?.includes('USDC')&&usd) usdc24+=usd;
       if(usd>big24) big24=usd;
       if(usd>=10e6)ic[4]++;else if(usd>=1e6)ic[3]++;else if(usd>=250000)ic[2]++;else ic[1]++;
       if(a.type==='WHALE_USDC') wUsdc++;
