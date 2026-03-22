@@ -168,6 +168,8 @@ async function fetchOps(){
     animNum($('m-usdc'),usdc,fN);
     $('upd').textContent=new Date().toLocaleTimeString('en',{hour12:false});
     renderFeed();renderBars();
+    // Persist to localStorage
+    try{localStorage.setItem('sm_feed',JSON.stringify(feed.slice(0,200)));}catch(e){}
   }catch(e){console.warn(e);}
 }
 
@@ -189,10 +191,31 @@ function renderBars(){
   [1,2,3,4].forEach(k=>{$('ib'+k).style.width=(ic[k]/tot*100)+'%';$('ic'+k).textContent=ic[k];});
 }
 
+let _lastDisplayedXLM = 0;
 setInterval(()=>{
   document.querySelectorAll('.ftime[data-ts]').forEach(el=>el.textContent=ago(el.dataset.ts));
-  animNum($('m-price'),XLM,v=>'$'+v.toFixed(4));
+  // Only animate XLM price if it actually changed
+  if(Math.abs(XLM - _lastDisplayedXLM) > 0.00005) {
+    animNum($('m-price'),XLM,v=>'$'+v.toFixed(4));
+    _lastDisplayedXLM = XLM;
+  }
 },1000);
+
+// Load saved history from localStorage
+try{
+  const saved=localStorage.getItem('sm_feed');
+  if(saved){
+    const parsed=JSON.parse(saved);
+    if(Array.isArray(parsed)&&parsed.length){
+      feed=parsed;
+      renderFeed();
+      // Update stats from saved data
+      const bv=feed.length?Math.max(...feed.map(f=>f.usd||0)):0;
+      $('m-alerts').textContent=feed.length;
+      $('m-biggest').textContent=fU(bv);
+    }
+  }
+}catch(e){}
 
 fetchPrice();fetchOps();
 setInterval(fetchOps,15000);setInterval(fetchPrice,60000);
