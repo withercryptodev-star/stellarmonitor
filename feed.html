@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzAyMDQwYSIvPgogIDxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMGM4ZmYiIHN0cm9rZS13aWR0aD0iMS41IiBvcGFjaXR5PSIwLjQiLz4KICA8dGV4dCB4PSIxNiIgeT0iMjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1zaXplPSIxNyIgZmlsbD0iIzAwYzhmZiI+UzwvdGV4dD4KPC9zdmc+">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>StellarMonitor — Live Feed</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -76,10 +77,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
 <nav>
   <a href="/" class="logo"><div class="logo-dot"></div>StellarMonitor</a>
   <div class="nav-center">
-    <a href="/feed"    class="nav-link active">Live Feed</a>
-    <a href="/scanner" class="nav-link">Scanner</a>
-    <a href="/graph"   class="nav-link">Graph</a>
-    <a href="/docs"    class="nav-link">Docs</a>
+    <a href="/feed.html"    class="nav-link active">Live Feed</a>
+    <a href="/scanner.html" class="nav-link">Scanner</a>
+    <a href="/graph.html"   class="nav-link">Graph</a>
+    <a href="/docs.html"    class="nav-link">Docs</a>
   </div>
   <a href="https://x.com/StellarMonitor" class="nav-cta" target="_blank">Follow ↗</a>
 </nav>
@@ -169,7 +170,7 @@ async function fetchFromAPI(){
 
     // Фильтруем за последние 24 часа
     const cutoff=Date.now()-86400000;
-    const today=alerts.filter(a=>new Date(a.created_at.replace(' ','T')+'Z').getTime()>cutoff);
+    const today=alerts.filter(a=>new Date(a.created_at).getTime()>cutoff);
 
     const items=today.map(a=>{
       const code=a.asset||a.selling||'XLM';
@@ -181,7 +182,7 @@ async function fetchFromAPI(){
       const sub=from?`${from.slice(0,6)}...${from.slice(-4)} → ${to?(to.slice(0,6)+'...'+to.slice(-4)):'?'}`:(a.pair||'');
       const tp=a.type==='SDEX'?'SDEX':a.type?.includes('AIRDROP')?'AIRDROP':'WHALE';
       const tc=tp==='WHALE'?'pw':tp==='SDEX'?'ps':'pm';
-      return{tp,tc,desc:disp,sub,usd,ts:a.created_at.replace(' ','T')+'Z',hash:a.tx_hash||'',link:a.link||''};
+      return{tp,tc,desc:disp,sub,usd,ts:a.created_at,hash:a.tx_hash||'',link:a.link||''};
     });
 
     items.sort((a,b)=>new Date(b.ts)-new Date(a.ts));
