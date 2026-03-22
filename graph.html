@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzAyMDQwYSIvPgogIDxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMGM4ZmYiIHN0cm9rZS13aWR0aD0iMS41IiBvcGFjaXR5PSIwLjQiLz4KICA8dGV4dCB4PSIxNiIgeT0iMjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1zaXplPSIxNyIgZmlsbD0iIzAwYzhmZiI+UzwvdGV4dD4KPC9zdmc+">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>StellarMonitor — Wallet Graph</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
@@ -211,10 +212,10 @@ nav{
     <div class="logo-dot"></div>StellarMonitor
   </a>
   <div class="nav-center">
-    <a href="/feed"    class="gnav-link">Live Feed</a>
-    <a href="/scanner" class="gnav-link">Scanner</a>
-    <a href="/graph"   class="gnav-link gnav-active">Graph</a>
-    <a href="/docs"    class="gnav-link">Docs</a>
+    <a href="/feed.html"    class="gnav-link">Live Feed</a>
+    <a href="/scanner.html" class="gnav-link">Scanner</a>
+    <a href="/graph.html"   class="gnav-link gnav-active">Graph</a>
+    <a href="/docs.html"    class="gnav-link">Docs</a>
   </div>
   <a href="https://x.com/StellarMonitor" class="gnav-cta" target="_blank">Follow ↗</a>
 </nav>
@@ -848,7 +849,7 @@ canvas.addEventListener('dblclick', e => {
   const {x,y} = worldPos(e);
   const node = nodeAt(x,y);
   if(node){
-    window.open('/scanner?addr='+encodeURIComponent(node.id), '_blank');
+    window.open('/scanner.html?addr='+encodeURIComponent(node.id), '_blank');
   }
 });
 
