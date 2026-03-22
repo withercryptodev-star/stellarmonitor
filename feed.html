@@ -120,6 +120,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
 
 <script>
 const H='https://horizon.stellar.org';
+const API='https://api.stellarmonitor.xyz';
 let XLM=0.174,feed=[],ic={1:0,2:0,3:0,4:0};
 const $=id=>document.getElementById(id);
 const fU=n=>{if(!n||n<=0)return'—';if(n>=1e9)return'$'+(n/1e9).toFixed(2)+'B';if(n>=1e6)return'$'+(n/1e6).toFixed(2)+'M';if(n>=1e3)return'$'+(n/1e3).toFixed(0)+'K';return'$'+n.toFixed(0)};
@@ -128,6 +129,41 @@ const ago=ts=>{const s=Math.floor((Date.now()-new Date(ts))/1000);if(s<60)return
 const pill=(t,c)=>`<span class="pill ${c}">${t}</span>`;
 
 function animNum(el,val,fmt){if(!el)return;el.style.transition='transform .12s ease,opacity .12s ease';el.style.transform='translateY(-110%)';el.style.opacity='0';setTimeout(()=>{el.textContent=fmt?fmt(val):val;el.style.transition='none';el.style.transform='translateY(110%)';el.style.opacity='0';requestAnimationFrame(()=>{el.style.transition='transform .12s ease,opacity .12s ease';el.style.transform='translateY(0)';el.style.opacity='1';});},120);}
+
+// Load history from our API server
+async function fetchFromAPI(){
+  try{
+    const r=await fetch(`${API}/api/alerts?limit=200`);
+    if(!r.ok) return;
+    const d=await r.json();
+    const alerts=d.alerts||[];
+    if(!alerts.length) return;
+
+    const items=alerts.map(a=>{
+      const code=a.asset||a.selling||'XLM';
+      const usd=a.usd_value||0;
+      const amt=a.amount||0;
+      const disp=amt>=1000?(amt>=1e6?(amt/1e6).toFixed(2)+'M ':(amt/1e3).toFixed(0)+'K ')+code:amt.toFixed(2)+' '+code;
+      const from=a.from_full||a.sender||'';
+      const to=a.to_full||'';
+      const sub=from?`${from.slice(0,6)}...${from.slice(-4)} → ${to.slice(0,6)||'?'}...${to.slice(-4)||'?'}`:(a.pair||'');
+      const tp=a.type==='SDEX'?'SDEX':a.type==='AIRDROP_SUMMARY'?'AIRDROP':'WHALE';
+      const tc=tp==='WHALE'?'pw':tp==='SDEX'?'ps':'pm';
+      return{tp,tc,desc:disp,sub,usd,ts:a.created_at,hash:a.tx_hash||a.link?.split('/tx/')[1]||'',link:a.link||''};
+    });
+
+    // Merge with existing feed
+    const seen=new Set(feed.map(f=>f.hash));
+    const newItems=items.filter(i=>i.hash&&!seen.has(i.hash));
+    feed=[...newItems,...feed].slice(0,500);
+
+    // Update stats
+    const bv=feed.length?Math.max(...feed.map(f=>f.usd||0)):0;
+    animNum($('m-alerts'),feed.length,v=>v);
+    animNum($('m-biggest'),bv,fU);
+    renderFeed();renderBars();
+  }catch(e){console.warn('API fetch error:',e);}
+}
 
 async function fetchPrice(){
   try{const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=stellar&vs_currencies=usd');const d=await r.json();XLM=parseFloat(d?.stellar?.usd)||XLM;animNum($('m-price'),XLM,v=>'$'+v.toFixed(4));}catch(e){}
@@ -201,24 +237,14 @@ setInterval(()=>{
   }
 },1000);
 
-// Load saved history from localStorage
-try{
-  const saved=localStorage.getItem('sm_feed');
-  if(saved){
-    const parsed=JSON.parse(saved);
-    if(Array.isArray(parsed)&&parsed.length){
-      feed=parsed;
-      renderFeed();
-      // Update stats from saved data
-      const bv=feed.length?Math.max(...feed.map(f=>f.usd||0)):0;
-      $('m-alerts').textContent=feed.length;
-      $('m-biggest').textContent=fU(bv);
-    }
-  }
-}catch(e){}
-
-fetchPrice();fetchOps();
-setInterval(fetchOps,15000);setInterval(fetchPrice,60000);
+// Load history from API server first (persistent), then live from Horizon
+fetchFromAPI().then(()=>{
+  fetchOps(); // also fetch latest from Horizon
+});
+fetchPrice();
+setInterval(fetchFromAPI, 60000); // refresh API history every minute
+setInterval(fetchOps, 15000);     // refresh live feed every 15s
+setInterval(fetchPrice, 60000);
 </script>
 </body>
 </html>
