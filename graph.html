@@ -318,6 +318,9 @@ nav{
   <div class="tt-row"><div class="tt-key">Received</div><div class="tt-val" id="tt-recv">—</div></div>
   <div class="tt-row"><div class="tt-key">Txs</div><div class="tt-val" id="tt-txs">—</div></div>
   <div class="tt-row"><div class="tt-key">Volume</div><div class="tt-val" id="tt-vol">—</div></div>
+  <div style="margin-top:6px;font-family:var(--mono);font-size:9px;color:var(--gray2);border-top:1px solid rgba(255,255,255,.06);padding-top:6px">
+    Click → Scanner &nbsp;·&nbsp; Dblclick → Load graph
+  </div>
 </div>
 
 <!-- LOADING -->
@@ -763,6 +766,7 @@ canvas.addEventListener('mousedown',e=>{
   const {x,y}=worldPos(e);
   const node=nodeAt(x,y);
   drag.active=true;
+  drag.didDrag=false; // reset on new click
   drag.startX=e.clientX; drag.startY=e.clientY;
   drag.camX=camera.x; drag.camY=camera.y;
   if(node){drag.node=node; canvas.style.cursor='grabbing';}
@@ -772,6 +776,9 @@ canvas.addEventListener('mousedown',e=>{
 canvas.addEventListener('mousemove',e=>{
   const {x,y}=worldPos(e);
   if(drag.active){
+    // Mark as drag if moved more than 5px
+    const dx=e.clientX-drag.startX, dy=e.clientY-drag.startY;
+    if(Math.sqrt(dx*dx+dy*dy)>5) drag.didDrag=true;
     if(drag.node){
       drag.node.x=x; drag.node.y=y;
       drag.node.vx=0; drag.node.vy=0;
@@ -804,11 +811,26 @@ canvas.addEventListener('mouseup',()=>{
   canvas.style.cursor='grab';
 });
 
+// Single click — открыть кошелёк в Scanner на новой вкладке
+let _clickTimer = null;
+canvas.addEventListener('click', e => {
+  if(drag.didDrag) return; // не срабатывает если тащили
+  clearTimeout(_clickTimer);
+  _clickTimer = setTimeout(()=>{
+    const {x,y} = worldPos(e);
+    const node = nodeAt(x,y);
+    if(node){
+      window.open('scanner.html?addr='+encodeURIComponent(node.id), '_blank');
+    }
+  }, 200); // ждём чтобы отличить от двойного клика
+});
+
+// Double click — перезагрузить граф с этого кошелька
 canvas.addEventListener('dblclick',e=>{
+  clearTimeout(_clickTimer); // отменяем одиночный клик
   const {x,y}=worldPos(e);
   const node=nodeAt(x,y);
-  if(node && !node.isRoot){
-    // Load subgraph from this node
+  if(node){
     document.getElementById('addr-input').value=node.id;
     loadGraph();
   }
@@ -862,6 +884,9 @@ function setDepth(el,d){
   depth=d;
   document.querySelectorAll('.depth-btn').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
+  // Автоматически перезагружаем граф если адрес уже введён
+  const addr = document.getElementById('addr-input').value.trim();
+  if(addr) loadGraph();
 }
 
 function resetView(){
