@@ -1,1 +1,404 @@
-<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=/feed"></head><body></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StellarMonitor — Live Feed</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#05080d;--dark:#090e16;--panel:#0c1220;--panel2:#0f1628;--edge:rgba(255,255,255,0.07);--edge2:rgba(255,255,255,0.03);--cyan:#00c8ff;--green:#00e87a;--orange:#ff8c00;--red:#ff3d5a;--white:#f0f4fa;--gray1:#8da0b8;--gray2:#4a6380;--mono:'DM Mono',monospace;--sans:'Outfit',sans-serif;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(5,8,13,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--edge)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--white);font-weight:700;font-size:15px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+.nav-center{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:4px}
+.nav-link{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gray1);text-decoration:none;padding:7px 16px;border-radius:3px;transition:all .15s;border:1px solid transparent}
+.nav-link:hover{color:var(--white);background:rgba(255,255,255,.05);border-color:var(--edge)}
+.nav-link.active{color:var(--cyan);border-color:rgba(0,200,255,.3);background:rgba(0,200,255,.06)}
+.nav-cta{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:7px 18px;border:1px solid var(--cyan);color:var(--cyan);border-radius:3px;text-decoration:none;transition:all .15s}
+.nav-cta:hover{background:var(--cyan);color:var(--bg)}
+.page{max-width:1100px;margin:0 auto;padding:88px 40px 40px}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.page-title{font-size:24px;font-weight:700;letter-spacing:-.5px}
+.live-badge{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--green)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.stat-box{background:var(--panel);border:1px solid var(--edge);border-radius:4px;padding:16px 20px}
+.sb-label{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray2);margin-bottom:8px}
+.sb-val{font-family:var(--mono);font-size:20px;font-weight:500;color:var(--white);overflow:hidden;height:26px;display:flex;align-items:center}
+.sb-val.cyan{color:var(--cyan)}.sb-val.green{color:var(--green)}
+
+/* FEED */
+.feed-layout{display:grid;grid-template-columns:1fr 280px;gap:20px}
+.feed-table{background:var(--panel);border:1px solid var(--edge);border-radius:4px;overflow:hidden}
+.feed-hdr{display:grid;grid-template-columns:90px 1fr 110px 90px;padding:10px 20px;background:var(--panel2);border-bottom:1px solid var(--edge);font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray2)}
+.feed-row{display:grid;grid-template-columns:90px 1fr 110px 90px;padding:13px 20px;border-bottom:1px solid var(--edge2);cursor:pointer;transition:background .1s;animation:row-in .25s ease forwards;opacity:0}
+.feed-row:hover{background:rgba(0,200,255,.03)}
+.feed-row:last-child{border-bottom:none}
+@keyframes row-in{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:translateX(0)}}
+.pill{display:inline-flex;align-items:center;padding:3px 8px;border-radius:2px;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:1px;text-transform:uppercase}
+.pw{background:rgba(255,140,0,.12);color:var(--orange)}.ps{background:rgba(0,200,255,.1);color:var(--cyan)}.pm{background:rgba(160,80,255,.1);color:#b87fff}
+.fdesc{font-size:13px;font-weight:500;color:var(--white)}.fsub{font-family:var(--mono);font-size:10px;color:var(--gray2);margin-top:2px}
+.famt{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--white);text-align:right}.famt.big{color:var(--orange)}.famt.huge{color:var(--red)}
+.ftime{font-family:var(--mono);font-size:10px;color:var(--gray2);text-align:right}
+
+/* PAGINATION */
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--edge);background:var(--panel2)}
+.pg-info{font-family:var(--mono);font-size:10px;color:var(--gray2)}
+.pg-btns{display:flex;gap:6px}
+.pg-btn{font-family:var(--mono);font-size:10px;padding:5px 12px;border:1px solid var(--edge);background:transparent;color:var(--gray1);border-radius:2px;cursor:pointer;transition:all .15s}
+.pg-btn:hover:not(:disabled){border-color:var(--cyan);color:var(--cyan)}
+.pg-btn:disabled{opacity:.3;cursor:default}
+.pg-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,200,255,.06)}
+
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:16px}
+.widget{background:var(--panel);border:1px solid var(--edge);border-radius:4px;padding:16px}
+.wt{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray2);margin-bottom:12px}
+.wr{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--edge2)}
+.wr:last-child{border-bottom:none}
+.wk{font-family:var(--mono);font-size:10px;color:var(--gray2)}.wv{font-family:var(--mono);font-size:11px;color:var(--cyan)}
+.ibr{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.ibl{font-family:var(--mono);font-size:9px;color:var(--gray2);width:48px}
+.ibt{flex:1;height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
+.ibf{height:100%;border-radius:2px;transition:width 1s ease}
+.ibc{font-family:var(--mono);font-size:9px;color:var(--gray2);width:18px;text-align:right}
+@media(max-width:768px){.feed-layout{grid-template-columns:1fr}.sidebar{display:none}.stats-row{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo"><div class="logo-dot"></div>StellarMonitor</a>
+  <div class="nav-center">
+    <a href="/feed"    class="nav-link active">Live Feed</a>
+    <a href="/scanner" class="nav-link">Scanner</a>
+    <a href="/graph"   class="nav-link">Graph</a>
+    <a href="/docs"    class="nav-link">Docs</a>
+  </div>
+  <a href="https://x.com/StellarMonitor" class="nav-cta" target="_blank">Follow ↗</a>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">Live Feed</div>
+    <div class="live-badge"><div class="live-dot"></div><span id="upd-label">Live</span></div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-box"><div class="sb-label">XLM Price</div><div class="sb-val cyan" id="m-price">—</div></div>
+    <div class="stat-box"><div class="sb-label">Alerts today (24h)</div><div class="sb-val" id="m-alerts">—</div></div>
+    <div class="stat-box"><div class="sb-label">USDC Volume 24h</div><div class="sb-val green" id="m-usdc">—</div></div>
+    <div class="stat-box"><div class="sb-label">Biggest tx today</div><div class="sb-val" id="m-biggest">—</div></div>
+  </div>
+
+  <div class="feed-layout">
+    <div class="feed-table">
+      <div class="feed-hdr"><div>Type</div><div>Details</div><div style="text-align:right">Amount</div><div style="text-align:right">Time</div></div>
+      <div id="fbody"><div style="padding:32px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--gray2)">Loading...</div></div>
+      <div class="pagination" id="pagination" style="display:none">
+        <div class="pg-info" id="pg-info"></div>
+        <div class="pg-btns" id="pg-btns"></div>
+      </div>
+    </div>
+    <div class="sidebar">
+      <div class="widget">
+        <div class="wt">Volume Distribution</div>
+        <div class="ibr"><div class="ibl">$10M+</div><div class="ibt"><div class="ibf" id="ib4" style="width:0%;background:var(--red)"></div></div><div class="ibc" id="ic4">0</div></div>
+        <div class="ibr"><div class="ibl">$1M+</div><div class="ibt"><div class="ibf" id="ib3" style="width:0%;background:var(--orange)"></div></div><div class="ibc" id="ic3">0</div></div>
+        <div class="ibr"><div class="ibl">$250K+</div><div class="ibt"><div class="ibf" id="ib2" style="width:0%;background:#f5c518"></div></div><div class="ibc" id="ic2">0</div></div>
+        <div class="ibr"><div class="ibl">$50K+</div><div class="ibt"><div class="ibf" id="ib1" style="width:0%;background:var(--cyan)"></div></div><div class="ibc" id="ic1">0</div></div>
+      </div>
+      <div class="widget">
+        <div class="wt">System Status</div>
+        <div class="wr"><div class="wk">Horizon API</div><div class="wv" style="color:var(--green)">● Online</div></div>
+        <div class="wr"><div class="wk">Bot</div><div class="wv" style="color:var(--green)" id="bot-status">● Online</div></div>
+        <div class="wr"><div class="wk">Last alert</div><div class="wv" id="last-alert" style="color:var(--gray2)">—</div></div>
+      </div>
+      <div class="widget">
+        <div class="wt">Alert Types (24h)</div>
+        <div class="wr"><div class="wk">Whale USDC</div><div class="wv" id="t-whale-usdc">0</div></div>
+        <div class="wr"><div class="wk">Whale XLM</div><div class="wv" id="t-whale-xlm">0</div></div>
+        <div class="wr"><div class="wk">SDEX</div><div class="wv" id="t-sdex">0</div></div>
+        <div class="wr"><div class="wk">Airdrop</div><div class="wv" id="t-airdrop">0</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const H='https://horizon.stellar.org';
+const API='https://api.stellarmonitor.xyz';
+let XLM=0.174;
+let allFeed=[];    // все транзакции за 24ч
+let liveFeed=[];   // последние с Horizon (реалтайм)
+let currentPage=0;
+const PAGE_SIZE=50;
+let ic={1:0,2:0,3:0,4:0};
+
+const $=id=>document.getElementById(id);
+const fU=n=>{if(!n||n<=0)return'—';if(n>=1e9)return'$'+(n/1e9).toFixed(2)+'B';if(n>=1e6)return'$'+(n/1e6).toFixed(2)+'M';if(n>=1e3)return'$'+(n/1e3).toFixed(0)+'K';return'$'+n.toFixed(0)};
+const fN=n=>{if(!n||n<=0)return'—';if(n>=1e9)return(n/1e9).toFixed(1)+'B';if(n>=1e6)return(n/1e6).toFixed(2)+'M';if(n>=1e3)return(n/1e3).toFixed(0)+'K';return n.toFixed(2)};
+const ago=ts=>{const s=Math.floor((Date.now()-new Date(ts))/1000);if(s<60)return s+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago'};
+const pill=(t,c)=>`<span class="pill ${c}">${t}</span>`;
+
+function animNum(el,val,fmt){
+  if(!el)return;
+  el.style.transition='transform .12s ease,opacity .12s ease';
+  el.style.transform='translateY(-110%)';el.style.opacity='0';
+  setTimeout(()=>{
+    el.textContent=fmt?fmt(val):val;
+    el.style.transition='none';el.style.transform='translateY(110%)';el.style.opacity='0';
+    requestAnimationFrame(()=>{el.style.transition='transform .12s ease,opacity .12s ease';el.style.transform='translateY(0)';el.style.opacity='1';});
+  },120);
+}
+
+// ── Fetch от API (история за 24ч) ──────────────────────────────────────────
+async function fetchFromAPI(){
+  try{
+    const r=await fetch(`${API}/api/alerts?limit=5000`);
+    if(!r.ok) return;
+    const d=await r.json();
+    const alerts=d.alerts||[];
+    if(!alerts.length) return;
+
+    // Фильтруем за последние 24 часа
+    const cutoff=Date.now()-86400000;
+    const today=alerts.filter(a=>new Date(a.created_at).getTime()>cutoff);
+
+    const items=today.map(a=>{
+      const code=a.asset||a.selling||'XLM';
+      const usd=a.usd_value||0;
+      const amt=a.amount||0;
+      const disp=amt>=1e6?(amt/1e6).toFixed(2)+'M '+code:amt>=1000?(amt/1e3).toFixed(0)+'K '+code:amt.toFixed(2)+' '+code;
+      const from=a.from_full||a.sender||'';
+      const to=a.to_full||'';
+      const sub=from?`${from.slice(0,6)}...${from.slice(-4)} → ${to?(to.slice(0,6)+'...'+to.slice(-4)):'?'}`:(a.pair||'');
+      const tp=a.type==='SDEX'?'SDEX':a.type?.includes('AIRDROP')?'AIRDROP':'WHALE';
+      const tc=tp==='WHALE'?'pw':tp==='SDEX'?'ps':'pm';
+      return{tp,tc,desc:disp,sub,usd,ts:a.created_at,hash:a.tx_hash||'',link:a.link||''};
+    });
+
+    items.sort((a,b)=>new Date(b.ts)-new Date(a.ts));
+
+    // Считаем статистику за 24ч
+    let usdc24=0,big24=0;
+    ic={1:0,2:0,3:0,4:0};
+    let wUsdc=0,wXlm=0,sdex=0,airdrop=0;
+
+    today.forEach(a=>{
+      const usd=a.usd_value||0;
+      if((a.asset==='USDC'||a.selling==='USDC')&&a.amount) usdc24+=a.amount;
+      if(usd>big24) big24=usd;
+      if(usd>=10e6)ic[4]++;else if(usd>=1e6)ic[3]++;else if(usd>=250000)ic[2]++;else ic[1]++;
+      if(a.type==='WHALE_USDC') wUsdc++;
+      else if(a.type==='WHALE_XLM') wXlm++;
+      else if(a.type==='SDEX') sdex++;
+      else if(a.type?.includes('AIRDROP')) airdrop++;
+    });
+
+    // Обновляем allFeed — мёрж с live
+    const seen=new Set(items.map(i=>i.hash).filter(Boolean));
+    const liveOnly=liveFeed.filter(l=>l.hash&&!seen.has(l.hash));
+    allFeed=[...liveOnly,...items];
+
+    // Stats
+    animNum($('m-alerts'), allFeed.length, v=>v);
+    animNum($('m-usdc'), usdc24, fN);
+    animNum($('m-biggest'), big24, fU);
+    // Persist to localStorage
+    try{localStorage.setItem('sm_stats',JSON.stringify({alerts:allFeed.length,usdc:usdc24,big:big24,ts:Date.now()}));}catch(e){}
+    try{localStorage.setItem('sm_feed_cache',JSON.stringify(allFeed.slice(0,500)));}catch(e){}
+
+    // Alert types
+    $('t-whale-usdc').textContent=wUsdc;
+    $('t-whale-xlm').textContent=wXlm;
+    $('t-sdex').textContent=sdex;
+    $('t-airdrop').textContent=airdrop;
+
+    // Last alert
+    if(items.length) $('last-alert').textContent=ago(items[0].ts);
+
+    renderBars();
+    if(currentPage===0) renderPage(0);
+    saveToStorage();
+
+  }catch(e){console.warn('API:',e);}
+}
+
+// ── Fetch новых с Horizon (реалтайм каждую секунду) ────────────────────────
+let _lastHorizonHash='';
+async function fetchLive(){
+  try{
+    const r=await fetch(`${H}/payments?limit=20&order=desc&include_failed=false`);
+    if(!r.ok)return;
+    const d=await r.json();
+    const ops=d?._embedded?.records||[];
+    if(!ops.length)return;
+
+    // Проверяем есть ли новые
+    if(ops[0].transaction_hash===_lastHorizonHash)return;
+    _lastHorizonHash=ops[0].transaction_hash;
+
+    const newItems=[];
+    ops.forEach(op=>{
+      if(op.type!=='payment')return;
+      const hash=op.transaction_hash;
+      // Не дублируем то что уже есть
+      if(allFeed.find(f=>f.hash===hash))return;
+      if(liveFeed.find(f=>f.hash===hash))return;
+      const amt=parseFloat(op.amount||0);
+      const code=op.asset_type==='native'?'XLM':(op.asset_code||'?');
+      const usd=code==='XLM'?amt*XLM:(['USDC','USDT'].includes(code)?amt:0);
+      const disp=amt>=1e6?(amt/1e6).toFixed(2)+'M '+code:amt>=1000?(amt/1e3).toFixed(0)+'K '+code:amt.toFixed(2)+' '+code;
+      if(code==='USDC'||code==='USDT'){ /* count */ }
+      if(usd>=10e6)ic[4]++;else if(usd>=1e6)ic[3]++;else if(usd>=250000)ic[2]++;else ic[1]++;
+      newItems.push({tp:'LIVE',tc:'ps',desc:disp,
+        sub:`${op.from?.slice(0,6)}...${op.from?.slice(-4)} → ${op.to?.slice(0,6)}...${op.to?.slice(-4)}`,
+        usd,ts:op.created_at,hash});
+    });
+
+    if(!newItems.length)return;
+
+    // Добавляем в начало
+    liveFeed=[...newItems,...liveFeed].slice(0,200);
+    allFeed=[...newItems,...allFeed];
+
+    // Обновляем счётчик
+    $('m-alerts').textContent=allFeed.length;
+    $('upd-label').textContent='Live · '+new Date().toLocaleTimeString('en',{hour12:false});
+    renderBars();
+
+    // Если на первой странице — обновляем её
+    if(currentPage===0) renderPage(0);
+
+  }catch(e){}
+}
+
+// ── Рендер страницы ────────────────────────────────────────────────────────
+function renderPage(page){
+  currentPage=page;
+  const total=allFeed.length;
+  const totalPages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+  const start=page*PAGE_SIZE;
+  const end=Math.min(start+PAGE_SIZE,total);
+  const slice=allFeed.slice(start,end);
+
+  const b=$('fbody');
+  if(!slice.length){
+    b.innerHTML='<div style="padding:32px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--gray2)">No transactions yet</div>';
+  } else {
+    b.innerHTML=slice.map((it,i)=>{
+      const ac=it.usd>=10e6?'huge':it.usd>=1e6?'big':'';
+      const link=it.link||`https://stellar.expert/explorer/public/tx/${it.hash}`;
+      return`<div class="feed-row" style="animation-delay:${Math.min(i,10)*20}ms" onclick="window.open('${link}','_blank')">
+        <div>${pill(it.tp,it.tc)}</div>
+        <div><div class="fdesc">${it.desc}</div><div class="fsub">${it.sub}</div></div>
+        <div class="famt ${ac}">${fU(it.usd)}</div>
+        <div class="ftime" data-ts="${it.ts}">${ago(it.ts)}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Pagination
+  const pg=$('pagination');
+  const pgInfo=$('pg-info');
+  const pgBtns=$('pg-btns');
+
+  if(total<=PAGE_SIZE){
+    pg.style.display='none';
+    return;
+  }
+
+  pg.style.display='flex';
+  pgInfo.textContent=`${start+1}–${end} of ${total}`;
+
+  // Build page buttons
+  let btns='';
+  btns+=`<button class="pg-btn" onclick="renderPage(${page-1})" ${page===0?'disabled':''}>← Prev</button>`;
+
+  // Show page numbers
+  const maxBtns=7;
+  let startP=Math.max(0,page-Math.floor(maxBtns/2));
+  let endP=Math.min(totalPages,startP+maxBtns);
+  startP=Math.max(0,endP-maxBtns);
+
+  if(startP>0) btns+=`<button class="pg-btn" onclick="renderPage(0)">1</button><span style="color:var(--gray2);padding:0 4px;font-family:var(--mono);font-size:10px">...</span>`;
+  for(let p=startP;p<endP;p++){
+    btns+=`<button class="pg-btn${p===page?' active':''}" onclick="renderPage(${p})">${p+1}</button>`;
+  }
+  if(endP<totalPages) btns+=`<span style="color:var(--gray2);padding:0 4px;font-family:var(--mono);font-size:10px">...</span><button class="pg-btn" onclick="renderPage(${totalPages-1})">${totalPages}</button>`;
+
+  btns+=`<button class="pg-btn" onclick="renderPage(${page+1})" ${page>=totalPages-1?'disabled':''}>Next →</button>`;
+  pgBtns.innerHTML=btns;
+}
+
+function renderBars(){
+  const tot=ic[1]+ic[2]+ic[3]+ic[4]||1;
+  [1,2,3,4].forEach(k=>{$('ib'+k).style.width=(ic[k]/tot*100)+'%';$('ic'+k).textContent=ic[k];});
+}
+
+async function fetchPrice(){
+  try{
+    const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=stellar&vs_currencies=usd');
+    const d=await r.json();
+    XLM=parseFloat(d?.stellar?.usd)||XLM;
+    animNum($('m-price'),XLM,v=>'$'+v.toFixed(4));
+  }catch(e){}
+}
+
+// ── Таймеры ────────────────────────────────────────────────────────────────
+let _lastXLM=0;
+setInterval(()=>{
+  // Обновляем время в ленте каждую секунду
+  document.querySelectorAll('.ftime[data-ts]').forEach(el=>{
+    el.textContent=ago(el.dataset.ts);
+  });
+  // XLM цена только если изменилась
+  if(Math.abs(XLM-_lastXLM)>0.00005){
+    animNum($('m-price'),XLM,v=>'$'+v.toFixed(4));
+    _lastXLM=XLM;
+  }
+},1000);
+
+// Новые транзакции с Horizon каждую секунду
+setInterval(fetchLive, 1000);
+
+// Обновляем историю с API каждые 30 секунд
+setInterval(fetchFromAPI, 30000);
+
+// Цена раз в минуту
+setInterval(fetchPrice, 60000);
+
+// ── Старт ─────────────────────────────────────────────────────────────────
+// Restore from localStorage instantly
+try{
+  const cached=localStorage.getItem('sm_feed_cache');
+  const stats=localStorage.getItem('sm_stats');
+  if(cached){
+    allFeed=JSON.parse(cached);
+    // Filter to 24h only
+    const cutoff=Date.now()-86400000;
+    allFeed=allFeed.filter(a=>new Date(a.ts).getTime()>cutoff);
+    if(allFeed.length) renderPage(0);
+  }
+  if(stats){
+    const s=JSON.parse(stats);
+    if(Date.now()-s.ts<86400000){ // only use if less than 24h old
+      $('m-alerts').textContent=s.alerts;
+      $('m-usdc').textContent=fN(s.usdc);
+      $('m-biggest').textContent=fU(s.big);
+    }
+  }
+}catch(e){}
+fetchPrice();
+fetchFromAPI();
+setTimeout(fetchLive, 1000);
+</script>
+</body>
+</html>
