@@ -77,10 +77,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
 <nav>
   <a href="/" class="logo"><div class="logo-dot"></div>StellarMonitor</a>
   <div class="nav-center">
-    <a href="/feed.html"    class="nav-link active">Live Feed</a>
-    <a href="/scanner.html" class="nav-link">Scanner</a>
-    <a href="/graph.html"   class="nav-link">Graph</a>
-    <a href="/docs.html"    class="nav-link">Docs</a>
+    <a href="/feed"    class="nav-link active">Live Feed</a>
+    <a href="/scanner" class="nav-link">Scanner</a>
+    <a href="/graph"   class="nav-link">Graph</a>
+    <a href="/docs"    class="nav-link">Docs</a>
   </div>
   <a href="https://x.com/StellarMonitor" class="nav-cta" target="_blank">Follow ↗</a>
 </nav>
@@ -299,7 +299,7 @@ function renderPage(page){
     b.innerHTML='<div style="padding:32px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--gray2)">No transactions yet</div>';
   } else {
     b.innerHTML=slice.map((it,i)=>{
-      const ac=it.usd>=10e6?'huge':it.usd>=1e6?'big':'';
+      if(!it.usd||it.usd<=0) return ''; const ac=it.usd>=10e6?'huge':it.usd>=1e6?'big':'';
       const link=it.link||`https://stellar.expert/explorer/public/tx/${it.hash}`;
       return`<div class="feed-row" style="animation-delay:${Math.min(i,10)*20}ms" onclick="window.open('${link}','_blank')">
         <div>${pill(it.tp,it.tc)}</div>
