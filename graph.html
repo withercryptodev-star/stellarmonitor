@@ -212,10 +212,10 @@ nav{
     <div class="logo-dot"></div>StellarMonitor
   </a>
   <div class="nav-center">
-    <a href="/feed.html"    class="gnav-link">Live Feed</a>
-    <a href="/scanner.html" class="gnav-link">Scanner</a>
-    <a href="/graph.html"   class="gnav-link gnav-active">Graph</a>
-    <a href="/docs.html"    class="gnav-link">Docs</a>
+    <a href="/feed"    class="gnav-link">Live Feed</a>
+    <a href="/scanner" class="gnav-link">Scanner</a>
+    <a href="/graph"   class="gnav-link gnav-active">Graph</a>
+    <a href="/docs"    class="gnav-link">Docs</a>
   </div>
   <a href="https://x.com/StellarMonitor" class="gnav-cta" target="_blank">Follow ↗</a>
 </nav>
@@ -849,7 +849,7 @@ canvas.addEventListener('dblclick', e => {
   const {x,y} = worldPos(e);
   const node = nodeAt(x,y);
   if(node){
-    window.open('/scanner.html?addr='+encodeURIComponent(node.id), '_blank');
+    window.open('/scanner?addr='+encodeURIComponent(node.id), '_blank');
   }
 });
 
