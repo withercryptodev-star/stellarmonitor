@@ -340,6 +340,12 @@ async function applyAndLoad(){
     $('data-source').textContent = `Horizon+API`;
     $('upd-time').textContent = new Date().toLocaleTimeString('en',{hour12:false});
 
+    // Cache to localStorage
+    try{
+      localStorage.setItem('sm_feed_v3', JSON.stringify(allFeed.slice(0,2000)));
+      localStorage.setItem('sm_feed_period', String(fPeriodDays));
+    }catch(e){}
+
     updateStats(allFeed);
     renderPage(0, allFeed);
 
@@ -456,14 +462,43 @@ async function fetchPrice(){
 
 let _lxlm=0;
 setInterval(()=>{
+  // Update timestamps
   document.querySelectorAll('.ftime[data-ts]').forEach(el=>{el.textContent=ago(el.dataset.ts);});
   if(Math.abs(XLM-_lxlm)>0.00005){animNum($('m-price'),XLM,v=>'$'+v.toFixed(4));_lxlm=XLM;}
+
+  // Remove expired transactions (sliding window)
+  if(fPeriodDays>0 && allFeed.length>0){
+    const cutoff=Date.now()-fPeriodDays*86400000;
+    const before=allFeed.length;
+    allFeed=allFeed.filter(it=>new Date(it.ts).getTime()>=cutoff);
+    if(allFeed.length!==before){
+      // Items were removed — update stats and re-render current page
+      updateStats(allFeed);
+      renderPage(currentPage,allFeed);
+    }
+  }
 },1000);
 
 setInterval(fetchLive,2000);
 setInterval(fetchPrice,60000);
 
 fetchPrice();
+
+// Restore from localStorage immediately to avoid blank screen on reload
+try{
+  const cached = localStorage.getItem('sm_feed_v3');
+  const cachedPeriod = parseInt(localStorage.getItem('sm_feed_period')||'1');
+  if(cached && cachedPeriod===fPeriodDays){
+    const parsed = JSON.parse(cached);
+    if(Array.isArray(parsed)&&parsed.length){
+      allFeed = parsed;
+      updateStats(allFeed);
+      renderPage(0, allFeed);
+      $('upd-label').textContent = 'Cached · '+new Date().toLocaleTimeString('en',{hour12:false});
+    }
+  }
+}catch(e){}
+
 applyAndLoad();
 </script>
 </body>
