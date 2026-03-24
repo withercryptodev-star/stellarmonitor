@@ -457,7 +457,7 @@ function showDetail(poolId){
       <span>${p.pair}</span>
       <span class="fee-badge">${p.fee.toFixed(2)}% fee</span>
       <div style="margin-left:auto;display:flex;gap:8px">
-        <a class="ext-link" href="https://stellarmonitor.xyz/pools" >Pools ↗</a>
+        <a class="ext-link" href="https://stellarterm.com/#exchange/${p.assetA}-${p.assetB}" target="_blank">Add Liquidity ↗</a>
         <a class="ext-link" href="https://stellar.expert/explorer/public/liquidity-pool/${p.id}" target="_blank">stellar.expert ↗</a>
         <span class="pd-close" onclick="$('pool-detail').style.display='none'">✕ Close</span>
       </div>
