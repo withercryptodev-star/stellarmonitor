@@ -217,7 +217,7 @@ async function fetchPools(){
     // Fetch from both sources in parallel
     // Stellar Expert has all pools with volume data
     const horizonPools = await fetchHorizonPools();
-    allPools = horizonPools.filter(p=>p.tvl>0||p.vol24>0);
+    allPools = horizonPools.filter(p=>(p.tvl>100||p.vol24>0)&&p.tvl<1e9);
     allPools.sort((a,b)=>b.tvl-a.tvl);
 
     checkAnomalies(allPools);
@@ -405,7 +405,8 @@ function checkAnomalies(pools){
 
 // ── Stats ──────────────────────────────────────────────────────────────────
 function updateStats(){
-  const totalTVL = allPools.reduce((s,p)=>s+p.tvl,0);
+  // Cap individual TVL at $50M to avoid garbage pools skewing total
+  const totalTVL = allPools.reduce((s,p)=>s+Math.min(p.tvl,50e6),0);
   const totalVol = allPools.reduce((s,p)=>s+p.vol24,0);
   const avgFee   = allPools.length ? allPools.reduce((s,p)=>s+p.fee,0)/allPools.length : 0;
   $('s-total').textContent  = allPools.length;
