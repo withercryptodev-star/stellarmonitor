@@ -282,7 +282,7 @@ function enrichStellarExpertPool(p){
     totalShares:parseFloat(p.shares||0)/10000000,
     tradeCount:parseInt(trades['1d']||0)+parseInt(trades['7d']||0),
     vol24,vol7d,vol5min:0,source,accounts:p.accounts||0,
-    aquaLink:isAqua?`https://aqua.network/pools/${p.id}/`:null,
+    aquaLink:isAqua?`https://aqua.network/pools/?filter=all&sort=-liquidity&tab=top`:null,
     expertLink:`https://stellar.expert/explorer/public/liquidity-pool/${p.id}`};
 }
 
@@ -503,8 +503,7 @@ function showDetail(poolId){
       <span>${p.pair}</span>
       <span class="fee-badge">${p.fee.toFixed(2)}% fee</span>
       <div style="margin-left:auto;display:flex;gap:8px">
-        ${p.aquaLink?`<a class="ext-link" href="${p.aquaLink}" target="_blank">AQUA ↗</a>`:''}
-        <a class="ext-link" href="https://aqua.network/pools/" target="_blank">Add Liquidity ↗</a>
+        <a class="ext-link" href="${p.source==='AQUA'?`https://aqua.network/pools/?filter=all&sort=-liquidity&tab=top`:`https://stellarterm.com/amm/`}" target="_blank">Add Liquidity ↗</a>
         <a class="ext-link" href="${p.expertLink||'https://stellar.expert/explorer/public/liquidity-pool/'+p.id}" target="_blank">stellar.expert ↗</a>
         <span class="pd-close" onclick="$('pool-detail').style.display='none'">✕ Close</span>
       </div>
