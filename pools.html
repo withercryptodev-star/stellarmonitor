@@ -206,42 +206,107 @@ function setSort(el){
   el.classList.add('on');
 }
 
-// ── Fetch pools from Horizon ───────────────────────────────────────────────
+// ── Fetch pools from Horizon + AQUA ────────────────────────────────────────
 async function fetchPools(){
-  $('pools-body').innerHTML='<div class="loading-msg"><div class="loading-spin"></div>Loading pools from Horizon...</div>';
+  $('pools-body').innerHTML='<div class="loading-msg"><div class="loading-spin"></div>Loading pools...</div>';
   
   try{
     // Fetch XLM price
     try{const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=stellar&vs_currencies=usd');const d=await r.json();XLM=parseFloat(d?.stellar?.usd)||XLM;}catch(e){}
 
-    let pools = [];
-    let url = `${H}/liquidity_pools?limit=200&order=desc`;
-    let pages = 0;
+    // Fetch from both sources in parallel
+    const [horizonPools, aquaPools] = await Promise.all([
+      fetchHorizonPools(),
+      fetchAquaPools(),
+    ]);
 
-    while(pages < 10){
-      const r = await fetch(url);
-      if(!r.ok) break;
-      const d = await r.json();
-      const batch = d?._embedded?.records||[];
-      if(!batch.length) break;
-      pools.push(...batch);
-      pages++;
-      const next = d?._links?.next?.href;
-      if(!next) break;
-      url = next;
-      await new Promise(r=>setTimeout(r,100));
-    }
+    // Merge — AQUA pools first (more data), then Horizon pools not in AQUA
+    const aquaIds = new Set(aquaPools.map(p=>p.id));
+    const horizonOnly = horizonPools.filter(p=>!aquaIds.has(p.id));
+    allPools = [...aquaPools, ...horizonOnly].filter(p=>p.tvl>0||p.vol24>0);
 
-    allPools = pools.map(p => enrichPool(p)).filter(p => p.tvl > 0);
-    await fetchVolumes(allPools);
+    // Sort by TVL by default
+    allPools.sort((a,b)=>b.tvl-a.tvl);
+
+    // Fetch volumes for horizon-only pools
+    if(horizonOnly.length>0) await fetchVolumes(horizonOnly.slice(0,30));
+
     checkAnomalies(allPools);
     updateStats();
     applyFilters();
-    $('last-upd').textContent = 'Updated '+new Date().toLocaleTimeString('en',{hour12:false});
+    $('last-upd').textContent = 'Updated '+new Date().toLocaleTimeString('en',{hour12:false})+' ('+allPools.length+' pools)';
 
   }catch(e){
-    $('pools-body').innerHTML = `<div class="empty-msg">Error loading pools: ${e.message}</div>`;
+    $('pools-body').innerHTML = `<div class="empty-msg">Error: ${e.message}</div>`;
   }
+}
+
+async function fetchHorizonPools(){
+  let pools=[], url=`${H}/liquidity_pools?limit=200&order=desc`, pages=0;
+  while(pages<5){
+    try{
+      const r=await fetch(url); if(!r.ok)break;
+      const d=await r.json();
+      const batch=d?._embedded?.records||[];
+      if(!batch.length)break;
+      pools.push(...batch); pages++;
+      const next=d?._links?.next?.href; if(!next)break;
+      url=next;
+      await new Promise(r=>setTimeout(r,80));
+    }catch(e){break;}
+  }
+  return pools.map(p=>enrichPool(p));
+}
+
+async function fetchAquaPools(){
+  try{
+    // AQUA AMM API
+    let pools=[], page=1;
+    while(page<=10){
+      const r=await fetch(`https://amm-api.aqua.network/api/v1/pools/?limit=200&page=${page}&sort=-total_liquidity_xlm`);
+      if(!r.ok) break;
+      const d=await r.json();
+      const results=d.results||d.pools||[];
+      if(!results.length) break;
+      pools.push(...results);
+      if(!d.next) break;
+      page++;
+      await new Promise(r=>setTimeout(r,80));
+    }
+    return pools.map(p=>enrichAquaPool(p));
+  }catch(e){
+    console.warn('AQUA API error:', e);
+    return [];
+  }
+}
+
+function enrichAquaPool(p){
+  // AQUA pool format
+  const tokens = p.tokens_str||p.pool_id_str||'';
+  const reserves = p.reserves||[];
+  const assetA = p.token_a_code||tokens.split('-')[0]||'?';
+  const assetB = p.token_b_code||tokens.split('-')[1]||'?';
+  const amtA = parseFloat(p.token_a_amount||p.reserve_a||0);
+  const amtB = parseFloat(p.token_b_amount||p.reserve_b||0);
+  const tvl = parseFloat(p.total_liquidity||p.tvl_usd||0) || 
+    (assetA==='XLM'?amtA*XLM:(['USDC','USDT'].includes(assetA)?amtA:0)) +
+    (assetB==='XLM'?amtB*XLM:(['USDC','USDT'].includes(assetB)?amtB:0));
+  
+  const vol24 = parseFloat(p.volume_24h||p.daily_volume||0);
+  const vol7d  = parseFloat(p.volume_7d||p.weekly_volume||0);
+  const fee    = parseFloat(p.fee||p.swap_fee||30)/100;
+
+  return {
+    id: p.pool_id||p.id||Math.random().toString(36).slice(2),
+    pair: `${assetA}/${assetB}`,
+    assetA, assetB, amtA, amtB,
+    tvl, fee: fee||0.3,
+    totalShares: parseFloat(p.total_shares||0),
+    tradeCount: parseInt(p.trade_count||p.total_trades||0),
+    vol24, vol7d, vol5min:0,
+    source: 'AQUA',
+    aquaLink: `https://aqua.network/pools/${p.pool_id||p.id}/`,
+  };
 }
 
 function enrichPool(p){
@@ -418,7 +483,7 @@ function renderPage(page){
       <div class="rank">${rank}</div>
       <div>
         <div class="pair-name">${p.pair}${p.anomaly?'<span style="margin-left:8px;font-family:var(--mono);font-size:9px;padding:2px 6px;background:rgba(255,61,90,.15);color:var(--red);border-radius:2px">⚡ SPIKE</span>':''}</div>
-        <div class="pair-id">${p.id.slice(0,16)}...</div>
+        <div class="pair-id">${p.source?`<span style="color:var(--cyan);margin-right:4px">[${p.source}]</span>`:''}${p.id.slice(0,16)}...</div>
       </div>
       <div class="pool-val cyan" style="text-align:right">${fU(p.tvl)}</div>
       <div style="text-align:right">
@@ -457,7 +522,8 @@ function showDetail(poolId){
       <span>${p.pair}</span>
       <span class="fee-badge">${p.fee.toFixed(2)}% fee</span>
       <div style="margin-left:auto;display:flex;gap:8px">
-        <a class="ext-link" href="https://stellarterm.com/#exchange/${p.assetA}-${p.assetB}" target="_blank">Add Liquidity ↗</a>
+        ${p.aquaLink?`<a class="ext-link" href="${p.aquaLink}" target="_blank">AQUA Pool ↗</a>`:''}
+        <a class="ext-link" href="https://stellarterm.com/" target="_blank">Add Liquidity ↗</a>
         <a class="ext-link" href="https://stellar.expert/explorer/public/liquidity-pool/${p.id}" target="_blank">stellar.expert ↗</a>
         <span class="pd-close" onclick="$('pool-detail').style.display='none'">✕ Close</span>
       </div>
