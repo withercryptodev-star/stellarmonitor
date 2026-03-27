@@ -379,7 +379,7 @@ async function fetchVolumes(pools){
 
 // ── Stats ──────────────────────────────────────────────────────────────────
 function updateStats(){
-  const totalTVL = allPools.reduce((s,p)=>s+p.tvl,0);
+  const totalTVL = allPools.reduce((s,p)=>s+Math.min(p.tvl,10e6),0);
   const totalVol = allPools.reduce((s,p)=>s+p.vol24,0);
   const avgFee   = allPools.length ? allPools.reduce((s,p)=>s+p.fee,0)/allPools.length : 0;
   $('s-total').textContent  = allPools.length;
