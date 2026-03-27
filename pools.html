@@ -247,11 +247,10 @@ async function fetchHorizonPools(){
       const batch=d?._embedded?.records||[];
       if(!batch.length)break;
       pools.push(...batch); pages++;
-      // Get cursor for next page
-      const nextHref=d?._links?.next?.href||'';
-      const m=nextHref.match(/cursor=(\d+)/);
-      if(!m)break;
-      cursor=parseInt(m[1]);
+      // Use paging_token from last record as cursor
+      const last=batch[batch.length-1];
+      if(!last||!last.paging_token)break;
+      cursor=last.paging_token;
       await new Promise(r=>setTimeout(r,80));
     }catch(e){break;}
   }
