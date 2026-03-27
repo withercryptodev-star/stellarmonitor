@@ -228,6 +228,7 @@ async function fetchPools(){
     // checkAnomalies disabled - causes too many Horizon requests
     updateStats();
     applyFilters();
+    isLoading=false;
     $('last-upd').textContent = 'Updated '+new Date().toLocaleTimeString('en',{hour12:false})+' ('+allPools.length+' pools)';
 
   }catch(e){
