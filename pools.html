@@ -142,7 +142,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
     </div>
     <div class="fb-group">
       <div class="fb-label">Min volume USD</div>
-      <input class="fb-input" id="f-minvol" placeholder="0" style="width:120px" value="0">
+      <input class="fb-input" id="f-minvol" placeholder="1000" style="width:120px" value="1000">
     </div>
     <div class="fb-group">
       <div class="fb-label">Sort by</div>
@@ -212,6 +212,7 @@ function setSort(el){
 
 // ── Fetch pools from Horizon + AQUA ────────────────────────────────────────
 async function fetchPools(){
+  isLoading=true;
   $('pools-body').innerHTML='<div class="loading-msg"><div class="loading-spin"></div>Loading pools...</div>';
   
   try{
@@ -426,7 +427,7 @@ function updateStats(){
 
 // ── Filters & render ───────────────────────────────────────────────────────
 function applyFilters(){
-  if(isLoading) return; // Don't apply while loading
+  if(isLoading||!allPools.length) return;
   const search = ($('f-search').value||'').toLowerCase().trim();
   const minVol = parseFloat($('f-minvol').value)||0;
 
