@@ -401,6 +401,7 @@ async function scan(){
       seenHashes.add(h);return true;
     });
     renderResults(applyFilters(_scanOps));
+    refilter();
     if(pages>=maxPages){const m=$('results-meta');if(m)m.innerHTML+=` <span style="color:var(--gray2);font-size:9px">· ${pages} pages</span>`;}
   }catch(e){$('sres').innerHTML=`<div class="rempty">Error: ${e.message}</div>`;}
 }
