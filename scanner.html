@@ -258,13 +258,17 @@ function isRound(n){return[100000,50000,10000,5000,1000].some(t=>n%t===0&&n>=t);
 function enrichOp(op){
   let amt=0,code='?',usd=0;
   if(['payment','path_payment_strict_send','path_payment_strict_receive'].includes(op.type)){
-    amt=parseFloat(op.amount||op.source_amount||0);
-    code=op.asset_type==='native'?'XLM':(op.asset_code||'?');
+    // path_payment_strict_receive uses destination_amount
+    amt=parseFloat(op.amount||op.destination_amount||op.source_amount||0);
+    code=op.asset_type==='native'?'XLM':(op.asset_code||op.destination_asset_code||'?');
+    if(code==='?'&&op.source_asset_type==='native'){code='XLM';amt=parseFloat(op.source_amount||0);}
     usd=code==='XLM'?amt*XLM:(['USDC','USDT','EURC','USDGLO'].includes(code)?amt:amt*XLM*0.1);
-  }else if(['manage_sell_offer','manage_buy_offer'].includes(op.type)){
+  }else if(['manage_sell_offer','manage_buy_offer','create_passive_sell_offer'].includes(op.type)){
     amt=parseFloat(op.amount||0);
     code=op.selling_asset_type==='native'?'XLM':(op.selling_asset_code||'?');
     usd=code==='XLM'?amt*XLM:(['USDC','USDT','EURC','USDGLO'].includes(code)?amt:amt*XLM*0.1);
+  }else if(op.type==='account_merge'){
+    code='XLM'; usd=0;
   }
   op._amt=amt;op._code=code;op._usd=usd;return op;
 }
