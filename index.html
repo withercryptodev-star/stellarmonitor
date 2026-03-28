@@ -318,7 +318,7 @@ async function fetchPrice(){
     const d=await r.json();
     const newPrice=parseFloat(d?.stellar?.usd)||XLM;
     const change24=parseFloat(d?.stellar?.usd_24h_change||0);
-    if(Math.abs(newPrice-XLM)>=0.0001){
+    if(XLM===0.166||Math.abs(newPrice-XLM)>=0.0001){
       XLM=newPrice;
       const sign=change24>=0?'+':'';
       const color=change24>=0?'#00e87a':'#ff3d5a';
