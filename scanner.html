@@ -442,7 +442,7 @@ async function loadWalletProfile(addr){
         if(usd>0){if(isIn){tin+=usd;dIn[day]=(dIn[day]||0)+usd;}else{tout+=usd;dOut[day]=(dOut[day]||0)+usd;}}
         if(usd>lar)lar=usd;if(other){cps.add(other);if(EXCHANGES.has(other))excnt++;}
       });
-      $('wp-txcount').textContent=ops.length+(ops.length>=200?'+':'');
+      if($('wp-txcount'))$('wp-txcount').textContent=ops.length+(ops.length>=200?'+':'');
       $('wp-in').textContent=fU(tin);$('wp-out').textContent=fU(tout);
       const net=tin-tout;const netEl=$('wp-net');netEl.textContent=(net>=0?'+':'')+fU(net);netEl.className='wp-sv '+(net>=0?'pos':'neg');
       $('wp-largest').textContent=fU(lar);$('wp-cp').textContent=cps.size;$('wp-ex').textContent=excnt;
@@ -491,7 +491,24 @@ function drawChart(dIn,dOut){
   });
 }
 
-function refilter(){if(_scanOps.length)renderResults(applyFilters(_scanOps));}
+function refilter(){
+  if(_scanOps.length){
+    renderResults(applyFilters(_scanOps));
+    // Rebuild chart from all scan ops
+    const addr=$('q').value.trim();
+    const dIn2={},dOut2={};
+    _scanOps.forEach(op=>{
+      if(op.type!=='payment')return;
+      const usd=op._usd||0;if(!usd)return;
+      const day=(op.created_at||'').slice(0,10);if(!day)return;
+      const isIn=op.to===addr;
+      if(isIn)dIn2[day]=(dIn2[day]||0)+usd;
+      else dOut2[day]=(dOut2[day]||0)+usd;
+    });
+    if(Object.keys(dIn2).length>1||Object.keys(dOut2).length>1)drawChart(dIn2,dOut2);
+    if($('wp-txcount')&&$('wp-txcount').textContent==='—')$('wp-txcount').textContent=_scanOps.length;
+  }
+}
 $('q').addEventListener('keydown',e=>{if(e.key==='Enter')scan();});
 $('token-addr')?.addEventListener('input',refilter);
 
