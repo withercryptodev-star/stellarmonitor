@@ -124,7 +124,7 @@ h1 .accent{color:var(--cyan)}
     <a href="/scanner" class="tool-card"><div class="tc-icon">🔍</div><div class="tc-title">Scanner</div><div class="tc-sub">Analyze wallet</div></a>
     <a href="/graph"   class="tool-card"><div class="tc-icon">🕸</div><div class="tc-title">Graph</div><div class="tc-sub">Connection map</div></a>
     <a href="/pools"   class="tool-card"><div class="tc-icon">💧</div><div class="tc-title">Pools</div><div class="tc-sub">Liquidity pools</div></a>
-    <a href="/docs"    class="tool-card"><div class="tc-icon">📄</div><div class="tc-title">Docs</div><div class="tc-sub">API reference</div></a>
+
   </div>
 </div>
 
@@ -153,7 +153,7 @@ h1 .accent{color:var(--cyan)}
   }));
 
   // Whales - slowly drift around
-  const WHALES = Array.from({length:5}, () => ({
+  const WHALES = Array.from({length:7}, () => ({
     r: Math.random()*.7+.15,
     a: Math.random()*Math.PI*2,
     va: (Math.random()-.5)*.0008, // drift speed
@@ -237,10 +237,12 @@ h1 .accent{color:var(--cyan)}
     // Whales — drift + detected by sweep
     WHALES.forEach(w=>{
       w.a += w.va; w.r = Math.max(.1, Math.min(.92, w.r+w.vr));
-      // Respawn at random position after fully faded
-      if(w.alpha<=0&&w.labelAlpha<=0&&Math.random()<.002){
-        w.a=Math.random()*Math.PI*2; w.r=Math.random()*.7+.15;
-        w.va=(Math.random()-.5)*.0008; w.vr=(Math.random()-.5)*.0003;
+      if(w.alpha<=0&&w.labelAlpha<=0){
+        if(Math.random()<.003){
+          w.a=Math.random()*Math.PI*2; w.r=Math.random()*.75+.12;
+          w.va=(Math.random()-.5)*.0012; w.vr=(Math.random()-.5)*.0005;
+          w.decay=Math.random()*.005+.002;
+        }
       }
       const wx=cx+Math.cos(w.a)*w.r*R;
       const wy=cy+Math.sin(w.a)*w.r*R;
