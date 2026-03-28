@@ -100,7 +100,7 @@ h1 .accent{color:var(--cyan)}
     <a href="/docs"    class="nav-link">Docs</a>
   </div>
   <div class="nav-right">
-    <a href="https://t.me/stellarmonitor" class="nav-cta" target="_blank" style="border-color:rgba(0,200,255,.5);background:rgba(0,200,255,.08);">Telegram</a>
+    <a href="https://t.me/stellarmonitor" class="nav-cta" target="_blank" style="border-color:rgba(0,200,255,.5);background:rgba(0,200,255,.08);">Telegram ↗</a>
     <a href="https://x.com/StellarMonitor" class="nav-cta" target="_blank">Follow ↗</a>
   </div>
 </nav>
@@ -129,7 +129,7 @@ h1 .accent{color:var(--cyan)}
 </div>
 
 <div class="stats-bar">
-  <div class="stat-item"><div class="s-label">XLM Price</div><div class="s-val cyan" id="s-price">—</div></div>
+  <div class="stat-item"><div class="s-label">XLM Price</div><div class="s-val cyan" id="s-price">—</div><span id="s-price-change" style="font-family:var(--mono);font-size:10px;margin-left:6px;font-weight:500"></span></div>
   <div class="stat-item"><div class="s-label">Alerts 24h</div><div class="s-val" id="s-alerts">—</div></div>
   <div class="stat-item"><div class="s-label">Volume 24h</div><div class="s-val green" id="s-usdc">—</div></div>
   <div class="stat-item"><div class="s-label">Biggest tx</div><div class="s-val" id="s-biggest">—</div></div>
@@ -321,8 +321,15 @@ async function fetchPrice(){
     if(Math.abs(newPrice-XLM)>=0.0001){
       XLM=newPrice;
       const sign=change24>=0?'+':'';
+      const color=change24>=0?'#00e87a':'#ff3d5a';
       const el=$('s-price');
-      if(el) animNum(el,newPrice,v=>`$${v.toFixed(4)} ${sign}${change24.toFixed(2)}%`);
+      if(el){
+        animNum(el,newPrice,v=>`$${v.toFixed(4)}`);
+        setTimeout(()=>{
+          const pct=document.getElementById('s-price-change');
+          if(pct){pct.textContent=`${sign}${change24.toFixed(2)}%`;pct.style.color=color;}
+        },200);
+      }
     }
   }catch(e){}
 }
