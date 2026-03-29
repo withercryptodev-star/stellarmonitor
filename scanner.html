@@ -128,7 +128,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
         <div class="wp-meta">
           <div class="wp-mi"><div class="wp-ml">Created</div><div class="wp-mv" id="wp-created">—</div></div>
           <div class="wp-mi"><div class="wp-ml">Last tx</div><div class="wp-mv" id="wp-last">—</div></div>
-          <div class="wp-mi"><div class="wp-ml">Txs loaded</div><div class="wp-mv" id="wp-txcount">—</div></div>
+          <div class="wp-mi"><div class="wp-ml">Txs loaded</div><div class="wp-mv" id="wp-txloaded">—</div></div>
           <div class="wp-mi"><div class="wp-ml">Net worth</div><div class="wp-mv" id="wp-worth" style="color:var(--cyan)">—</div></div>
         </div>
       </div>
@@ -193,6 +193,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
       <div class="fp-label">Sort by</div>
       <div class="chips" id="fc-sort">
         <div class="chip on"  onclick="setFilter('sort',this,'time')">Newest</div>
+        <div class="chip"     onclick="setFilter('sort',this,'oldest')">Oldest</div>
+        <span style="color:var(--edge);padding:0 4px;font-size:14px;align-self:center">|</span>
         <div class="chip"     onclick="setFilter('sort',this,'usd')">Largest</div>
       </div>
     </div>
@@ -288,7 +290,9 @@ function applyFilters(ops){
     if(specials.round&&!isRound(op._amt||0))return false;
     return true;
   });
-  if(filters.sort==='usd')
+  if(filters.sort==='oldest')
+    rows.sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+  else if(filters.sort==='usd')
     rows.sort((a,b)=>{
       const diff=(b._usd||0)-(a._usd||0);
       if(diff!==0)return diff;
@@ -448,6 +452,7 @@ async function loadWalletProfile(addr){
         if(usd>lar)lar=usd;if(other){cps.add(other);if(EXCHANGES.has(other))excnt++;}
       });
       if($('wp-txcount'))$('wp-txcount').textContent=ops.length+(ops.length>=200?'+':'');
+      if($('wp-txloaded'))$('wp-txloaded').textContent=ops.length+(ops.length>=200?'+':'');
       $('wp-in').textContent=fU(tin);$('wp-out').textContent=fU(tout);
       const net=tin-tout;const netEl=$('wp-net');netEl.textContent=(net>=0?'+':'')+fU(net);netEl.className='wp-sv '+(net>=0?'pos':'neg');
       $('wp-largest').textContent=fU(lar);$('wp-cp').textContent=cps.size;$('wp-ex').textContent=excnt;
@@ -508,8 +513,8 @@ function drawChart(dIn,dOut){
     if(days.length>1)c.fillText(days[days.length-1].slice(5),W-pad,H-2);
     if(days.length>2){const mi=Math.floor(days.length/2);c.fillText(days[mi].slice(5),pad+mi*bw,H-2);}
   };
-  if(cvs.parentElement?.offsetWidth>0)doRender();
-  else setTimeout(doRender,100);
+  if(cvs.parentElement?.offsetWidth>10)doRender();
+  else{setTimeout(doRender,200);setTimeout(doRender,500);}
 }
 // Tooltip
 (function(){
@@ -550,8 +555,9 @@ function refilter(){
       if(isIn)dIn2[day]=(dIn2[day]||0)+usd;
       else dOut2[day]=(dOut2[day]||0)+usd;
     });
-    setTimeout(()=>drawChart(dIn2,dOut2),150);
-    if($('wp-txcount')&&$('wp-txcount').textContent==='—')$('wp-txcount').textContent=_scanOps.length;
+    setTimeout(()=>requestAnimationFrame(()=>drawChart(dIn2,dOut2)),200);
+    if($('wp-txcount'))$('wp-txcount').textContent=_scanOps.length;
+    if($('wp-txloaded'))$('wp-txloaded').textContent=_scanOps.length;
   }
 }
 $('q').addEventListener('keydown',e=>{if(e.key==='Enter')scan();});
