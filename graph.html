@@ -586,8 +586,8 @@ function tickForce() {
     if(n.pinned || drag.node===n) return;
     // Cap velocity to prevent explosion
     const speed=Math.sqrt(n.vx*n.vx+n.vy*n.vy);
-    if(speed>8){n.vx=n.vx/speed*8;n.vy=n.vy/speed*8;}
-    n.vx*=0.78; n.vy*=0.78;
+    if(speed>6){n.vx=n.vx/speed*6;n.vy=n.vy/speed*6;}
+    n.vx*=0.72; n.vy*=0.72;
     n.x+=n.vx; n.y+=n.vy;
     // Bounce back if outside canvas
     if(n.x<50)   {n.x=50;   n.vx=Math.abs(n.vx)*0.3;}
@@ -1165,7 +1165,8 @@ function renderBPChart() {
   const pad=10*dpr,bw2=(W-pad*2)/(days.length-1||1);
   const minP=Math.min(...pts),maxP=Math.max(...pts,1),range=maxP-minP||1;
   window._bpDays=days;window._bpPts=pts;window._bpPad=pad;window._bpBw=bw2;window._bpW=W;window._bpDpr=dpr;
-  const getY=v=>H2-pad*2-(((v-minP)/range)*(H2-pad*3)*.85);
+  const plotH=H2-pad*3;
+  const getY=v=>pad+(plotH-(((v-minP)/range)*plotH*.9));
   const zeroY=getY(0);
   const aPath=new Path2D();
   aPath.moveTo(pad,getY(pts[0]));pts.forEach((v,i)=>{if(i>0)aPath.lineTo(pad+i*bw2,getY(v));});
