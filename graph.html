@@ -1193,9 +1193,9 @@ function renderBPChart() {
 // BP chart tooltip
 (function(){
   const cvs=document.getElementById('bp-canvas');
-  const tip=document.getElementById('bp-tip');
-  if(!cvs||!tip)return;
+  if(!cvs)return;
   cvs.addEventListener('mousemove',e=>{
+    const tip=document.getElementById('bp-tip');if(!tip)return;
     if(!window._bpDays||!window._bpDays.length)return;
     const rect=cvs.getBoundingClientRect();
     const x=e.clientX-rect.left;
@@ -1226,7 +1226,7 @@ function renderBPChart() {
       tip.style.top=Math.max(10,e.clientY-30)+'px';
     });
   });
-  cvs.addEventListener('mouseleave',()=>{if(tip)tip.style.display='none';});
+  cvs.addEventListener('mouseleave',()=>{const tip=document.getElementById('bp-tip');if(tip)tip.style.display='none';});
 })();
 
 function renderBPStats() {
