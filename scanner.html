@@ -81,10 +81,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
 .pill{display:inline-flex;align-items:center;padding:3px 8px;border-radius:2px;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:1px;text-transform:uppercase}
 .pw{background:rgba(255,140,0,.12);color:var(--orange)}.ps{background:rgba(0,200,255,.1);color:var(--cyan)}.pm{background:rgba(160,80,255,.1);color:#b87fff}
 .fdesc{font-size:12px;font-weight:500;color:var(--white)}.fsub{font-family:var(--mono);font-size:9px;color:var(--gray2);margin-top:2px}
-.famt{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--white);text-align:right;display:flex;align-items:center;justify-content:flex-end}
+.famt{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--white);text-align:right}
 .famt.big{color:var(--orange)}.famt.huge{color:var(--red)}
 .rhdr-amt{text-align:right}
-.ftime{font-family:var(--mono);font-size:10px;color:var(--gray2);text-align:right}
+.ftime{font-family:var(--mono);font-size:10px;color:var(--gray2);padding-left:8px}
 
 @media(max-width:768px){.wp-grid{grid-template-columns:1fr}.rhdr,.rrow{grid-template-columns:70px 1fr 90px 70px}.rhdr>div:last-child,.rrow>div:last-child{display:none}}
 </style>
@@ -444,7 +444,7 @@ async function scan(){
   const isAllTime=filters.periodHours===0;
   const cutoffDate=isAllTime?new Date(0):new Date(Date.now()-filters.periodHours*3600000);
   const label=document.querySelector('#fc-period .chip.on')?.textContent||'';
-  const maxPages=isAllTime?1000:filters.periodHours<=1?2:filters.periodHours<=24?5:filters.periodHours<=168?15:50;
+  const maxPages=isAllTime?3000:filters.periodHours<=1?2:filters.periodHours<=24?5:filters.periodHours<=168?15:50;
   try{
     let cursor=null,pages=0,allOps=[];
     const isOldest=filters.sort==='oldest';
