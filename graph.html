@@ -302,6 +302,7 @@ nav{
       <span id="bp-chart-range" style="color:var(--gray2)"></span>
     </div>
     <canvas id="bp-canvas" style="cursor:crosshair"></canvas>
+  <div id="bp-tip" style="display:none;position:fixed;background:rgba(2,4,10,0.97);border:1px solid rgba(0,200,255,0.3);padding:6px 10px;border-radius:3px;font-family:monospace;font-size:11px;color:#f0f4fa;pointer-events:none;z-index:9999;white-space:nowrap"></div>
     <div class="bp-loading" id="bp-chart-load">
       <div class="bps-spin"></div>Loading history...
     </div>
@@ -746,7 +747,7 @@ async function loadGraph() {
 
     // Arrange non-root nodes in orbit - auto-scale radius by count
     const nonRoot=graph.nodes.filter(n=>!n.isRoot);
-    const baseR = Math.max(150, Math.min(400, 80 + nonRoot.length * 12));
+    const baseR = Math.max(250, Math.min(800, 120 + nonRoot.length * 25));
     nonRoot.forEach((n,i)=>{
       const angle=(i/nonRoot.length)*Math.PI*2;
       const r=baseR+n.depth*100+(Math.random()-0.5)*60;
@@ -755,11 +756,11 @@ async function loadGraph() {
     });
     // Auto-fit zoom for many nodes
     if(nonRoot.length > 8) {
-      const fitScale = Math.max(0.2, Math.min(0.9, 6 / Math.sqrt(nonRoot.length)));
+      const fitScale = Math.max(0.25, Math.min(0.85, 10 / Math.sqrt(nonRoot.length)));
       const cx = canvas.width/2, cy = canvas.height/2;
       camera.scale = fitScale;
-      camera.x = cx - cx * fitScale;
-      camera.y = cy - cy * fitScale;
+      camera.x = cx * (1 - fitScale);
+      camera.y = cy * (1 - fitScale);
     }
 
     // Info panel
