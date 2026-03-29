@@ -1159,9 +1159,9 @@ function renderBPChart() {
   const days=Object.keys(dayB).sort().slice(-60);
   if(!days.length)return;
   let run=0;const pts=days.map(d=>{run+=(dayB[d].i||0)-(dayB[d].o||0);return run;});
-  window._bpDays=days;window._bpPts=pts;window._bpPad=pad;window._bpBw=bw2;window._bpW=W;window._bpDpr=dpr;
-  const minP=Math.min(...pts),maxP=Math.max(...pts,1),range=maxP-minP||1;
   const pad=10*dpr,bw2=(W-pad*2)/(days.length-1||1);
+  const minP=Math.min(...pts),maxP=Math.max(...pts,1),range=maxP-minP||1;
+  window._bpDays=days;window._bpPts=pts;window._bpPad=pad;window._bpBw=bw2;window._bpW=W;window._bpDpr=dpr;
   const getY=v=>H2-pad*2-(((v-minP)/range)*(H2-pad*3)*.85);
   const zeroY=getY(0);
   const aPath=new Path2D();
