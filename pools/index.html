@@ -123,7 +123,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
     <div class="stat-box"><div class="sb-label">Total Pools</div><div class="sb-val cyan" id="s-total">—</div></div>
     <div class="stat-box"><div class="sb-label">Total TVL</div><div class="sb-val" id="s-tvl">—</div></div>
     <div class="stat-box"><div class="sb-label">24h Volume</div><div class="sb-val green" id="s-vol24">—</div></div>
-    <div class="stat-box"><div class="sb-label">Avg Fee</div><div class="sb-val" id="s-fee">—</div></div>
+    <div class="stat-box"><div class="sb-label">Total Earned 24h</div><div class="sb-val green" id="s-fee">—</div></div>
   </div>
 
   <!-- FILTERS -->
@@ -151,6 +151,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
         <span class="chip"    data-sort="tvl"    onclick="setSort(this)">TVL</span>
         <span class="chip"    data-sort="apr"    onclick="setSort(this)">APR</span>
         <span class="chip"    data-sort="earned" onclick="setSort(this)">Earned</span>
+        <span class="chip"    data-sort="fee"    onclick="setSort(this)">Fee %</span>
       </div>
     </div>
     <button class="fb-btn" onclick="applyFilters()">Apply</button>
@@ -380,11 +381,11 @@ async function fetchVolumes(pools){
 function updateStats(){
   const totalTVL = allPools.reduce((s,p)=>s+Math.min(p.tvl,10e6),0);
   const totalVol = allPools.reduce((s,p)=>s+p.vol24,0);
-  const avgFee   = allPools.length ? allPools.reduce((s,p)=>s+p.fee,0)/allPools.length : 0;
+  const totalEarned = allPools.reduce((s,p)=>s+(p.earned24||0),0);
   $('s-total').textContent  = allPools.length;
   $('s-tvl').textContent    = fU(totalTVL);
   $('s-vol24').textContent  = fU(totalVol)||'Loading...';
-  $('s-fee').textContent    = avgFee.toFixed(2)+'%';
+  $('s-fee').textContent    = fU(totalEarned);
 }
 
 // ── Filters & render ───────────────────────────────────────────────────────
@@ -406,6 +407,7 @@ function applyFilters(){
   else if(sortBy==='tvl') filteredPools.sort((a,b)=>b.tvl-a.tvl);
   else if(sortBy==='apr') filteredPools.sort((a,b)=>getApr(b)-getApr(a));
   else if(sortBy==='earned') filteredPools.sort((a,b)=>(b.earned24||0)-(a.earned24||0));
+  else if(sortBy==='fee') filteredPools.sort((a,b)=>b.fee-a.fee);
 
   renderPage(0);
 }
