@@ -107,7 +107,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
     <a href="/pools"   class="nav-link active">Pools</a>
     <a href="/docs"    class="nav-link">Docs</a>
   </div>
-  <a href="https://x.com/StellarMonitor" class="nav-cta" target="_blank">Follow ↗</a>
+  <div style="display:flex;gap:8px"><a href="https://t.me/stellarmonitor" class="nav-cta" style="border-color:rgba(0,200,255,.4);background:rgba(0,200,255,.06)" target="_blank">Telegram ↗</a><a href="https://x.com/StellarMonitor" class="nav-cta" target="_blank">Follow ↗</a></div>
 </nav>
 
 <div class="page">
@@ -150,7 +150,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
         <span class="chip on" data-sort="volume" onclick="setSort(this)">Volume</span>
         <span class="chip"    data-sort="tvl"    onclick="setSort(this)">TVL</span>
         <span class="chip"    data-sort="apr"    onclick="setSort(this)">APR</span>
-        <span class="chip"    data-sort="fee"    onclick="setSort(this)">Fee</span>
+        <span class="chip"    data-sort="earned" onclick="setSort(this)">Earned</span>
       </div>
     </div>
     <button class="fb-btn" onclick="applyFilters()">Apply</button>
@@ -167,7 +167,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
       <div style="text-align:right">TVL</div>
       <div style="text-align:right">24h Volume</div>
       <div style="text-align:right">7d Volume</div>
-      <div style="text-align:right">Fee</div>
+      <div style="text-align:right">Earned 24h</div>
       <div style="text-align:right">APR est.</div>
     </div>
     <div id="pools-body">
@@ -274,6 +274,9 @@ function enrichStellarExpertPool(p){
   const vv=p.volume_value||{};
   const vol24=parseFloat(vv['1d']||0)/10000000;
   const vol7d=parseFloat(vv['7d']||0)/10000000;
+  const ev=p.earned_value||{};
+  const earned24=parseFloat(ev['1d']||0)/10000000;
+  const earned7d=parseFloat(ev['7d']||0)/10000000;
   const fee=(p.fee||30)/100; // 30 basis points = 0.30%
   const trades=p.trades||{};
   const domains=[a0.domain||'',a1.domain||''];
@@ -282,7 +285,7 @@ function enrichStellarExpertPool(p){
     [assetA,assetB].some(c=>c==='AQUA')||
     issuers2.some(i=>i.includes('GARQ7O5JPBD2DDVE')||i.includes('GBNZILSTVQZ4R7I'));
   const source=isAqua2?'AQUA':domains.some(d=>d.includes('ultrastellar')||d.includes('lobstr'))?'LOBSTR':'';
-  return{id:p.id,pair:`${assetA}/${assetB}`,assetA,assetB,amtA,amtB,tvl,fee,
+  return{id:p.id,pair:`${assetA}/${assetB}`,assetA,assetB,amtA,amtB,tvl,fee,earned24,earned7d,
     totalShares:parseFloat(p.shares||0)/10000000,
     tradeCount:parseInt(trades['1d']||0)+parseInt(trades['7d']||0),
     vol24,vol7d,vol5min:0,source,accounts:p.accounts||0,
@@ -402,7 +405,7 @@ function applyFilters(){
   if(sortBy==='volume') filteredPools.sort((a,b)=>b.vol24-a.vol24);
   else if(sortBy==='tvl') filteredPools.sort((a,b)=>b.tvl-a.tvl);
   else if(sortBy==='apr') filteredPools.sort((a,b)=>getApr(b)-getApr(a));
-  else if(sortBy==='fee') filteredPools.sort((a,b)=>b.fee-a.fee);
+  else if(sortBy==='earned') filteredPools.sort((a,b)=>(b.earned24||0)-(a.earned24||0));
 
   renderPage(0);
 }
@@ -424,6 +427,7 @@ function renderPage(page){
   $('pools-body').innerHTML = slice.map((p,i)=>{
     const rank = start+i+1;
     const apr  = p.tvl>0 ? (p.vol24*365*p.fee/100/p.tvl*100).toFixed(1) : '—';
+    const earned24disp = fU(p.earned24||0);
     const aprColor = parseFloat(apr)>20?'green':parseFloat(apr)>5?'orange':'';
     const volPct = (p.vol24/maxVol*100).toFixed(1);
     return`<div class="pool-row" style="animation-delay:${Math.min(i,10)*20}ms" onclick="showDetail('${p.id}')">
