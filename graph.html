@@ -218,7 +218,7 @@ nav{
     <a href="/pools"   class="gnav-link">Pools</a>
     <a href="/docs"    class="gnav-link">Docs</a>
   </div>
-  <a href="https://x.com/StellarMonitor" class="gnav-cta" target="_blank">Follow ↗</a>
+  <div style="display:flex;gap:8px"><a href="https://t.me/stellarmonitor" class="gnav-cta" style="border-color:rgba(0,200,255,.4);background:rgba(0,200,255,.06)" target="_blank">Telegram ↗</a><a href="https://x.com/StellarMonitor" class="gnav-cta" target="_blank">Follow ↗</a></div>
 </nav>
 
 <!-- SEARCH -->
@@ -248,11 +248,11 @@ nav{
 <!-- LEGEND -->
 <div class="legend">
   <div class="legend-title">Node type</div>
-  <div class="legend-item"><div class="ldot" style="background:var(--cyan)"></div>Root wallet</div>
-  <div class="legend-item"><div class="ldot" style="background:var(--green)"></div>Sent to</div>
-  <div class="legend-item"><div class="ldot" style="background:var(--orange)"></div>Received from</div>
-  <div class="legend-item"><div class="ldot" style="background:var(--purple)"></div>Both directions</div>
-  <div class="legend-item"><div class="ldot" style="background:var(--gray2)"></div>Exchange</div>
+  <label class="legend-item" style="cursor:pointer"><input type="checkbox" id="f-root" checked onchange="applyNodeFilter()"><div class="ldot" style="background:var(--cyan)"></div>Root wallet</label>
+  <label class="legend-item" style="cursor:pointer"><input type="checkbox" id="f-sent" checked onchange="applyNodeFilter()"><div class="ldot" style="background:var(--green)"></div>Sent to</label>
+  <label class="legend-item" style="cursor:pointer"><input type="checkbox" id="f-recv" checked onchange="applyNodeFilter()"><div class="ldot" style="background:var(--orange)"></div>Received from</label>
+  <label class="legend-item" style="cursor:pointer"><input type="checkbox" id="f-both" checked onchange="applyNodeFilter()"><div class="ldot" style="background:var(--purple)"></div>Both directions</label>
+  <label class="legend-item" style="cursor:pointer"><input type="checkbox" id="f-exch" checked onchange="applyNodeFilter()"><div class="ldot" style="background:var(--gray2)"></div>Exchange</label>
 </div>
 
 <!-- INFO PANEL -->
@@ -353,6 +353,20 @@ let hoveredNode = null;
 let depth = 1;
 let animFrame = null;
 
+const EXCHANGES_GRAPH = new Set([
+  'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN',
+  'GBDEVU63Y6NTHJQQZIKVTC23NWLQVP3WJ2RI2OTSJTNYOIGICST6DUXR',
+  'GCNSGHUCG5VMGLT5RIYYZSO7VQULQKAJ62QA33DBC5PPBSO57LFWVV6P',
+  'GBIDGDSVQXAHGZNOETS7ADUMWCDSQJU4R53EZRK6ONP3BA42UJL5PAHR',
+  'GC7BWB2ME4LII3TVWTHUIT7KGJXU4D5M6JUNLQ57WA7JERDNSAEXLOAN',
+  'GCGLKWJX5BPX2BOCOHYA6KUBZ67FR23DAHLG7VD3YRTGEYGZX57KUGFP',
+  'GCUAD7TQWTAHMIOFQQG6DYU3YWOKJYLRJ4EONNNVIU5VNA4HNHO7NTSS',
+  'GDM4UWTGHCWSTM7Z46PNF4BLH35GS6IUZYBWNNI4VU5KVIHYSIVQ55Y6',
+  'GAVA7FY3KBXJVZDBX254LPM53YXRUEVLM5BXMXZOC7ZIW3HXFP6LT4SR',
+  'GBVUDZFNMQBBKXZ3FGPXFCFG5ZFWDRXCWB7EBJSN4Y5BVMHFEVVVT2',
+  'GBTMY37BHEUNXSESORCPQR4BKRW3QABQBLSRLHM62MQLPJGZJ5EJWQP',
+  'GCO2IP3MJNUOKS4PUDI4C7LGGMQDJGXG3COYX3WSB4HHNAHKYV5YL3VC',
+]);
 const KNOWN = {
   'GBVUDZFNMQBBKXZ3FGPXFCFG5ZFWDRXCWB7EBJSN4Y5BVMHFEVVVT2':'Binance',
   'GCO2IP3MJNUOKS4PUDI4C7LGGMQDJGXG3COYX3WSB4HHNAHKYV5YL3VC':'Kraken',
@@ -728,14 +742,22 @@ async function loadGraph() {
     const root=graph.nodeMap[addr];
     if(root){root.x=canvas.width/2;root.y=canvas.height/2;root.pinned=false;}
 
-    // Arrange non-root nodes in orbit
+    // Arrange non-root nodes in orbit - auto-scale radius by count
     const nonRoot=graph.nodes.filter(n=>!n.isRoot);
+    const baseR = Math.max(150, Math.min(400, 80 + nonRoot.length * 12));
     nonRoot.forEach((n,i)=>{
       const angle=(i/nonRoot.length)*Math.PI*2;
-      const r=150+n.depth*80+(Math.random()-0.5)*60;
+      const r=baseR+n.depth*100+(Math.random()-0.5)*60;
       n.x=canvas.width/2+Math.cos(angle)*r;
       n.y=canvas.height/2+Math.sin(angle)*r;
     });
+    // Auto-fit zoom for many nodes
+    if(nonRoot.length > 15) {
+      const fitScale = Math.max(0.3, Math.min(1, 8 / Math.sqrt(nonRoot.length)));
+      camera.scale = fitScale;
+      camera.x = canvas.width/2 * (1 - fitScale);
+      camera.y = canvas.height/2 * (1 - fitScale);
+    }
 
     // Info panel
     const totalVol=graph.nodes.reduce((s,n)=>s+n.sentUsd+n.recvUsd,0)/2;
@@ -911,6 +933,27 @@ function resetView(){
   camera={x:0,y:0,scale:1};
 }
 
+let _nodeFilter={root:true,sent:true,recv:true,both:true,exch:true};
+function applyNodeFilter(){
+  _nodeFilter={
+    root:document.getElementById('f-root').checked,
+    sent:document.getElementById('f-sent').checked,
+    recv:document.getElementById('f-recv').checked,
+    both:document.getElementById('f-both').checked,
+    exch:document.getElementById('f-exch').checked,
+  };
+  draw();
+}
+function isNodeVisible(n){
+  if(n.isRoot) return _nodeFilter.root;
+  if(n.isExchange) return _nodeFilter.exch;
+  const hasSent=n.sentUsd>0, hasRecv=n.recvUsd>0;
+  if(hasSent&&hasRecv) return _nodeFilter.both;
+  if(hasSent) return _nodeFilter.sent;
+  if(hasRecv) return _nodeFilter.recv;
+  return true;
+}
+
 function exportPng(){
   const a=document.createElement('a');
   draw();
@@ -1038,7 +1081,7 @@ async function loadBPHistory() {
 
   try {
     // Fetch up to 15 pages of payments for "All time", fewer for short periods
-    const maxPages = bpDays >= 99999 ? 20 : bpDays >= 365 ? 15 : bpDays >= 30 ? 8 : 3;
+    const maxPages = bpDays >= 99999 ? 500 : bpDays >= 365 ? 100 : bpDays >= 30 ? 30 : 5;
     let ops=[], cursor=null;
     const cutoff = bpDays>=99999 ? new Date(0) : new Date(Date.now()-bpDays*86400000);
     const base = `${H}/accounts/${bpAddr}/payments?limit=200&order=desc&include_failed=false`;
@@ -1086,15 +1129,17 @@ async function loadBPHistory() {
 
 function renderBPChart() {
   const cvs = document.getElementById('bp-canvas');
-  cvs.width  = cvs.offsetWidth * window.devicePixelRatio || 262;
-  cvs.height = 90 * window.devicePixelRatio || 90;
+  const dpr = window.devicePixelRatio||1;
+  cvs.width  = (cvs.parentElement?.offsetWidth||262)*dpr;
+  cvs.height = 120*dpr;
+  cvs.style.height='120px';
   const c = cvs.getContext('2d');
   const W = cvs.width, H2 = cvs.height;
   c.clearRect(0,0,W,H2);
 
   if(!bpHistory.length) {
     c.fillStyle='rgba(255,255,255,0.1)';
-    c.font=`${10*window.devicePixelRatio}px DM Mono`;
+    c.font=`${10*dpr}px DM Mono`;
     c.textAlign='center';
     c.fillText('No data for this period', W/2, H2/2);
     return;
