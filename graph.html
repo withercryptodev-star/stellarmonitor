@@ -608,6 +608,7 @@ function draw() {
 
   // Edges
   graph.edges.forEach(e=>{
+    if(!isNodeVisible(graph.nodeMap[e.from])||!isNodeVisible(graph.nodeMap[e.to])) return;
     const a=nm[e.from], b=nm[e.to];
     if(!a||!b) return;
     const maxUsd=5e6;
@@ -643,6 +644,7 @@ function draw() {
 
   // Nodes
   graph.nodes.forEach(n=>{
+    if(!isNodeVisible(n)) return;
     const col  = nodeColor(n);
     const isHov = hoveredNode && hoveredNode.id===n.id;
     const r = isHov ? n.r*1.12 : n.r;
