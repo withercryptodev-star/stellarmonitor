@@ -301,7 +301,7 @@ nav{
       <span id="bp-chart-ttl">USDC flow</span>
       <span id="bp-chart-range" style="color:var(--gray2)"></span>
     </div>
-    <canvas id="bp-canvas"></canvas>
+    <canvas id="bp-canvas" style="cursor:crosshair"></canvas>
     <div class="bp-loading" id="bp-chart-load">
       <div class="bps-spin"></div>Loading history...
     </div>
@@ -1158,6 +1158,7 @@ function renderBPChart() {
   const days=Object.keys(dayB).sort().slice(-60);
   if(!days.length)return;
   let run=0;const pts=days.map(d=>{run+=(dayB[d].i||0)-(dayB[d].o||0);return run;});
+  window._bpDays=days;window._bpPts=pts;window._bpPad=pad;window._bpBw=bw2;window._bpW=W;window._bpDpr=dpr;
   const minP=Math.min(...pts),maxP=Math.max(...pts,1),range=maxP-minP||1;
   const pad=10*dpr,bw2=(W-pad*2)/(days.length-1||1);
   const getY=v=>H2-pad*2-(((v-minP)/range)*(H2-pad*3)*.85);
@@ -1178,6 +1179,35 @@ function renderBPChart() {
   if(days.length>0)c.fillText(days[0].slice(5),pad,H2-2);
   if(days.length>1)c.fillText(days[days.length-1].slice(5),W-pad,H2-2);
 }
+
+// BP chart tooltip
+(function(){
+  const cvs=document.getElementById('bp-canvas');
+  const tip=document.getElementById('bp-tip');
+  if(!cvs||!tip)return;
+  cvs.addEventListener('mousemove',e=>{
+    if(!window._bpDays||!window._bpDays.length)return;
+    const rect=cvs.getBoundingClientRect();
+    const x=e.clientX-rect.left;
+    const y=e.clientY-rect.top;
+    if(x<0||x>rect.width||y<0||y>rect.height){tip.style.display='none';return;}
+    const dpr=window._bpDpr||1;
+    const pad=window._bpPad/dpr||10;
+    const bw=window._bpBw/dpr||1;
+    const days=window._bpDays;
+    const pts=window._bpPts;
+    const i=Math.round((x-pad)/bw);
+    if(i<0||i>=days.length){tip.style.display='none';return;}
+    const val=pts[i];
+    const sign=val>=0?'+':'-';
+    const color=val>=0?'#00e87a':'#ff3d5a';
+    tip.innerHTML=`<span style="color:#8da0b8">${days[i]}</span> <span style="color:${color};font-weight:600">${sign}$${Math.abs(val).toLocaleString('en',{maximumFractionDigits:0})}</span>`;
+    tip.style.display='block';
+    tip.style.left=(e.clientX+12)+'px';
+    tip.style.top=(e.clientY-30)+'px';
+  });
+  cvs.addEventListener('mouseleave',()=>{if(tip)tip.style.display='none';});
+})();
 
 function renderBPStats() {
   const now    = Date.now();
