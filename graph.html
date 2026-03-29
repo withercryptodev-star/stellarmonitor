@@ -577,8 +577,8 @@ function tickForce() {
       n.vx+=(cx-n.x)*0.08;
       n.vy+=(cy-n.y)*0.08;
     } else {
-      n.vx+=(cx-n.x)*0.006;
-      n.vy+=(cy-n.y)*0.006;
+      n.vx+=(cx-n.x)*0.001;
+      n.vy+=(cy-n.y)*0.001;
     }
   });
 
@@ -590,11 +590,11 @@ function tickForce() {
     if(speed>8){n.vx=n.vx/speed*8;n.vy=n.vy/speed*8;}
     n.vx*=0.78; n.vy*=0.78;
     n.x+=n.vx; n.y+=n.vy;
-    // Bounce back if outside screen
-    if(n.x<margin)   {n.x=margin;   n.vx=Math.abs(n.vx)*0.3;}
-    if(n.x>W-margin) {n.x=W-margin; n.vx=-Math.abs(n.vx)*0.3;}
-    if(n.y<margin)   {n.y=margin;   n.vy=Math.abs(n.vy)*0.3;}
-    if(n.y>H2-margin){n.y=H2-margin;n.vy=-Math.abs(n.vy)*0.3;}
+    // Bounce back if outside canvas
+    if(n.x<50)   {n.x=50;   n.vx=Math.abs(n.vx)*0.3;}
+    if(n.x>W-50) {n.x=W-50; n.vx=-Math.abs(n.vx)*0.3;}
+    if(n.y<50)   {n.y=50;   n.vy=Math.abs(n.vy)*0.3;}
+    if(n.y>H2-50){n.y=H2-50;n.vy=-Math.abs(n.vy)*0.3;}
   });
 }
 
