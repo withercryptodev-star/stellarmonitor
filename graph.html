@@ -302,7 +302,6 @@ nav{
       <span id="bp-chart-range" style="color:var(--gray2)"></span>
     </div>
     <canvas id="bp-canvas" style="cursor:crosshair"></canvas>
-  <div id="bp-tip" style="display:none;position:fixed;background:rgba(2,4,10,0.97);border:1px solid rgba(0,200,255,0.3);padding:6px 10px;border-radius:3px;font-family:monospace;font-size:11px;color:#f0f4fa;pointer-events:none;z-index:9999;white-space:nowrap"></div>
     <div class="bp-loading" id="bp-chart-load">
       <div class="bps-spin"></div>Loading history...
     </div>
@@ -1247,5 +1246,6 @@ function renderBPStats() {
 }
 </script>
 
+<div id="bp-tip" style="display:none;position:fixed;background:rgba(2,4,10,0.97);border:1px solid rgba(0,200,255,0.3);padding:6px 10px;border-radius:3px;font-family:monospace;font-size:11px;color:#f0f4fa;pointer-events:none;z-index:99999;white-space:nowrap"></div>
 </body>
 </html>
