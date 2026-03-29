@@ -275,9 +275,46 @@ const EXCHANGES=new Set([
   // Changelly
   'GBZ35ZJRIKJGYH5PBKLKOZ5L5GZTBN3BFZWVHOAADNKXHKZZ7NDSXQX',
 ]);
-// Also detect exchanges by keyword in account data
+// Cache for TOML-verified exchange addresses
+const _exchangeCache=new Map(); // addr -> true/false/null(pending)
+
+async function checkTomlExchange(addr){
+  if(EXCHANGES.has(addr))return true;
+  if(_exchangeCache.has(addr))return _exchangeCache.get(addr);
+  _exchangeCache.set(addr,null);
+  try{
+    const r=await fetch(`https://horizon.stellar.org/accounts/${addr}`,{signal:AbortSignal.timeout(3000)});
+    if(!r.ok){_exchangeCache.set(addr,false);return false;}
+    const d=await r.json();
+    const domain=d.home_domain||'';
+    if(!domain){_exchangeCache.set(addr,false);return false;}
+    // Check if domain TOML has exchange/anchor keywords
+    const tr=await fetch(`https://${domain}/.well-known/stellar.toml`,{signal:AbortSignal.timeout(3000)});
+    if(!tr.ok){_exchangeCache.set(addr,false);return false;}
+    const txt=await tr.text();
+    const isEx=/(exchange|cex|trading|anchor|bitso|kraken|binance|coinbase|okx|upbit|bithumb|huobi|gate\.io|lobstr|stronghold)/i.test(txt);
+    _exchangeCache.set(addr,isEx);
+    return isEx;
+  }catch(e){_exchangeCache.set(addr,false);return false;}
+}
+
 function isExchangeAddr(addr){
-  return EXCHANGES.has(addr);
+  return EXCHANGES.has(addr)||_exchangeCache.get(addr)===true;
+}
+
+// Run TOML checks for all counterparties after scan
+async function enrichExchanges(ops, walletAddr){
+  const counterparties=new Set();
+  ops.forEach(op=>{
+    if(op.type!=='payment')return;
+    const other=op.to===walletAddr?op.from:op.to;
+    if(other&&!EXCHANGES.has(other)&&!_exchangeCache.has(other))counterparties.add(other);
+  });
+  // Check in parallel batches of 5
+  const addrs=[...counterparties];
+  for(let i=0;i<addrs.length;i+=5){
+    await Promise.all(addrs.slice(i,i+5).map(a=>checkTomlExchange(a)));
+  }
 }
 const filters={type:'all',usd:0,asset:'all',sort:'time',periodHours:1};
 const specials={exchange:false,round:false,repeat:false,circular:false};
@@ -443,6 +480,19 @@ async function scan(){
     });
     renderResults(applyFilters(_scanOps));
     refilter();
+    // Background TOML exchange check
+    const _walletAddr=$('q').value.trim();
+    enrichExchanges(_scanOps,_walletAddr).then(()=>{
+      // Recount exchange txs after TOML checks complete
+      let excnt2=0;
+      const dIn3={},dOut3={};
+      _scanOps.forEach(op=>{
+        if(op.type!=='payment')return;
+        const other=op.to===_walletAddr?op.from:op.to;
+        if(isExchangeAddr(other))excnt2++;
+      });
+      if($('wp-ex'))$('wp-ex').textContent=excnt2;
+    });
     if(pages>=maxPages){const m=$('results-meta');if(m)m.innerHTML+=` <span style="color:var(--gray2);font-size:9px">· ${pages} pages</span>`;}
   }catch(e){$('sres').innerHTML=`<div class="rempty">Error: ${e.message}</div>`;}
 }
