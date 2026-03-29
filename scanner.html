@@ -370,6 +370,7 @@ function applyFilters(ops){
     if(filters.type==='payment'&&op.type!=='payment')return false;
     if(filters.type==='sdex'&&!['manage_sell_offer','manage_buy_offer'].includes(op.type))return false;
     if(filters.type==='path'&&!op.type?.startsWith('path_'))return false;
+    if(op._code==='?'&&(op._usd||0)===0&&(op._amt||0)===0)return false;
     if((op._usd||0)<filters.usd)return false;
     if(filters.asset!=='all'&&op._code!==filters.asset)return false;
     if(cutoff>0&&new Date(op.created_at).getTime()<cutoff)return false;
@@ -403,8 +404,9 @@ function renderResults(rows){
   $('meta-vol').textContent=fU(tv);
   $('meta-biggest').textContent=fU(bv);
   res.innerHTML=rows.slice(0,100).map(op=>{
-    const tp=['manage_sell_offer','manage_buy_offer'].includes(op.type)?'SDEX':op.type?.startsWith('path_')?'PATH':'WHALE';
-    const pc=tp==='WHALE'?'pw':tp==='SDEX'?'ps':'pm';
+    const _knownTypes=['payment','path_payment_strict_send','path_payment_strict_receive','manage_sell_offer','manage_buy_offer','create_passive_sell_offer'];
+    const tp=['manage_sell_offer','manage_buy_offer','create_passive_sell_offer'].includes(op.type)?'SDEX':op.type?.startsWith('path_')?'PATH':op.type==='payment'?'WHALE':'OTHER';
+    const pc=tp==='WHALE'?'pw':tp==='SDEX'?'ps':tp==='PATH'?'pm':'po';
     const desc=tp==='SDEX'?`${op.selling_asset_code||'XLM'} → ${op.buying_asset_code||'XLM'}`:`${fN(op._amt||0)} ${op._code||'?'}`;
     const fe=isExchangeAddr(op.from||'')?'🏦':'',te=isExchangeAddr(op.to||'')?'🏦':'';
     const sub=op.from?`${fe}${op.from.slice(0,6)}...${op.from.slice(-4)} → ${te}${(op.to||'?').slice(0,6)}...${(op.to||'?').slice(-4)}`:'';
@@ -589,18 +591,60 @@ function drawChart(dIn,dOut){
     const isPos=pts[pts.length-1]>=pts[0];
     const lineColor=isPos?'#00e87a':'#ff3d5a';
     const fillColor=isPos?'rgba(0,232,122,0.15)':'rgba(255,61,90,0.15)';
-    // Area
-    const grad=c.createLinearGradient(0,0,0,H);
-    grad.addColorStop(0,isPos?'rgba(0,232,122,0.3)':'rgba(255,61,90,0.3)');
-    grad.addColorStop(1,'rgba(0,0,0,0)');
-    c.beginPath();c.moveTo(pad,getY(pts[0]));
-    pts.forEach((v,i)=>{if(i>0)c.lineTo(pad+i*bw,getY(v));});
-    c.lineTo(pad+(pts.length-1)*bw,H-pad*2);c.lineTo(pad,H-pad*2);c.closePath();
-    c.fillStyle=grad;c.fill();
-    // Line
-    c.beginPath();c.moveTo(pad,getY(pts[0]));
-    pts.forEach((v,i)=>{if(i>0)c.lineTo(pad+i*bw,getY(v));});
-    c.strokeStyle=lineColor;c.lineWidth=1.5*dpr;c.stroke();
+    const zeroY=getY(0);
+    // Draw area segments - green above zero, red below
+    for(let i=1;i<pts.length;i++){
+      const x1=pad+(i-1)*bw, x2=pad+i*bw;
+      const y1=getY(pts[i-1]), y2=getY(pts[i]);
+      const isAbove1=pts[i-1]>=0, isAbove2=pts[i]>=0;
+      if(isAbove1===isAbove2){
+        // Same side - simple fill
+        const g=c.createLinearGradient(0,Math.min(y1,y2),0,zeroY);
+        g.addColorStop(0,isAbove1?'rgba(0,232,122,0.3)':'rgba(255,61,90,0.3)');
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        c.beginPath();c.moveTo(x1,zeroY);c.lineTo(x1,y1);c.lineTo(x2,y2);c.lineTo(x2,zeroY);c.closePath();
+        c.fillStyle=g;c.fill();
+      } else {
+        // Crosses zero - split at intersection
+        const t=(pts[i-1])/(pts[i-1]-pts[i]);
+        const xz=x1+(x2-x1)*t;
+        // First segment
+        const g1=c.createLinearGradient(0,0,0,zeroY);
+        g1.addColorStop(0,isAbove1?'rgba(0,232,122,0.3)':'rgba(255,61,90,0.3)');
+        g1.addColorStop(1,'rgba(0,0,0,0)');
+        c.beginPath();c.moveTo(x1,zeroY);c.lineTo(x1,y1);c.lineTo(xz,zeroY);c.closePath();
+        c.fillStyle=g1;c.fill();
+        // Second segment
+        const g2=c.createLinearGradient(0,0,0,zeroY);
+        g2.addColorStop(0,isAbove2?'rgba(0,232,122,0.3)':'rgba(255,61,90,0.3)');
+        g2.addColorStop(1,'rgba(0,0,0,0)');
+        c.beginPath();c.moveTo(xz,zeroY);c.lineTo(x2,y2);c.lineTo(x2,zeroY);c.closePath();
+        c.fillStyle=g2;c.fill();
+      }
+    }
+    // Zero line
+    if(minP<0&&maxP>0){
+      c.strokeStyle='rgba(255,255,255,0.15)';c.lineWidth=0.5*dpr;c.setLineDash([4,4]);
+      c.beginPath();c.moveTo(pad,zeroY);c.lineTo(W-pad,zeroY);c.stroke();
+      c.setLineDash([]);
+    }
+    // Line - color changes at zero
+    for(let i=1;i<pts.length;i++){
+      const x1=pad+(i-1)*bw, x2=pad+i*bw;
+      const y1=getY(pts[i-1]), y2=getY(pts[i]);
+      const isAbove1=pts[i-1]>=0, isAbove2=pts[i]>=0;
+      if(isAbove1===isAbove2){
+        c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);
+        c.strokeStyle=isAbove1?'#00e87a':'#ff3d5a';c.lineWidth=1.5*dpr;c.stroke();
+      } else {
+        const t=pts[i-1]/(pts[i-1]-pts[i]);
+        const xz=x1+(x2-x1)*t;
+        c.beginPath();c.moveTo(x1,y1);c.lineTo(xz,zeroY);
+        c.strokeStyle=isAbove1?'#00e87a':'#ff3d5a';c.lineWidth=1.5*dpr;c.stroke();
+        c.beginPath();c.moveTo(xz,zeroY);c.lineTo(x2,y2);
+        c.strokeStyle=isAbove2?'#00e87a':'#ff3d5a';c.lineWidth=1.5*dpr;c.stroke();
+      }
+    }
     // Baseline
     c.strokeStyle='rgba(255,255,255,0.05)';c.lineWidth=dpr*0.5;
     c.beginPath();c.moveTo(pad,H-pad*2);c.lineTo(W-pad,H-pad*2);c.stroke();
