@@ -546,9 +546,9 @@ function tickForce() {
       const a=nodes[i], b=nodes[j];
       const dx=b.x-a.x, dy=b.y-a.y;
       const dist=Math.sqrt(dx*dx+dy*dy)||1;
-      const minDist=(a.r+b.r)*2.2+40;
+      const minDist=(a.r+b.r)*4+120;
       if(dist<minDist){
-        const force=(minDist-dist)/dist*0.3;
+        const force=(minDist-dist)/dist*0.8;
         const fx=dx*force, fy=dy*force;
         if(!a.pinned){a.vx-=fx;a.vy-=fy;}
         if(!b.pinned){b.vx+=fx;b.vy+=fy;}
@@ -562,9 +562,9 @@ function tickForce() {
     if(!a||!b) return;
     const dx=b.x-a.x, dy=b.y-a.y;
     const dist=Math.sqrt(dx*dx+dy*dy)||1;
-    const idealDist = 100 + (a.r+b.r);
+    const idealDist = 250 + (a.r+b.r);
     if(dist > idealDist){
-      const force=(dist-idealDist)/dist*0.035;
+      const force=(dist-idealDist)/dist*0.015;
       const fx=dx*force, fy=dy*force;
       if(!a.pinned){a.vx+=fx;a.vy+=fy;}
       if(!b.pinned){b.vx-=fx;b.vy-=fy;}
@@ -577,8 +577,7 @@ function tickForce() {
       n.vx+=(cx-n.x)*0.08;
       n.vy+=(cy-n.y)*0.08;
     } else {
-      n.vx+=(cx-n.x)*0.001;
-      n.vy+=(cy-n.y)*0.001;
+      // no center gravity for non-root
     }
   });
 
@@ -747,7 +746,7 @@ async function loadGraph() {
 
     // Arrange non-root nodes in orbit - auto-scale radius by count
     const nonRoot=graph.nodes.filter(n=>!n.isRoot);
-    const baseR = Math.max(250, Math.min(800, 120 + nonRoot.length * 25));
+    const baseR = Math.max(400, Math.min(1200, 200 + nonRoot.length * 40));
     nonRoot.forEach((n,i)=>{
       const angle=(i/nonRoot.length)*Math.PI*2;
       const r=baseR+n.depth*100+(Math.random()-0.5)*60;
