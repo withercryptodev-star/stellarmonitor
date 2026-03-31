@@ -15,7 +15,7 @@ body{background:var(--bg);color:var(--white);font-family:var(--sans);-webkit-fon
 nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(5,8,13,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--edge)}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--white);font-weight:700;font-size:15px}
 .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
-.nav-center{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:4px}
+.nav-center{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:1px}
 .nav-link{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gray1);text-decoration:none;padding:7px 16px;border-radius:3px;transition:all .15s;border:1px solid transparent}
 .nav-link:hover{color:var(--white);background:rgba(255,255,255,.05);border-color:var(--edge)}
 .nav-link.active{color:var(--cyan);border-color:rgba(0,200,255,.3);background:rgba(0,200,255,.06)}
@@ -107,7 +107,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
     <a href="/pools"   class="nav-link active">Pools</a>
     <a href="/soroban"      class="nav-link">Soroban</a>
     <a href="/intelligence" class="nav-link">Intelligence</a>
-    <a href="/docs"    class="nav-link">Docs</a>
   </div>
   <div style="display:flex;gap:8px"><a href="https://t.me/stellarmonitor" class="nav-cta" style="border-color:rgba(0,200,255,.4);background:rgba(0,200,255,.06)" target="_blank">Telegram ↗</a><a href="https://x.com/StellarMonitor" class="nav-cta" target="_blank">Follow ↗</a></div>
 </nav>
