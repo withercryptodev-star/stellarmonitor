@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzAyMDQwYSIvPgogIDxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMGM4ZmYiIHN0cm9rZS13aWR0aD0iMS41IiBvcGFjaXR5PSIwLjQiLz4KICA8dGV4dCB4PSIxNiIgeT0iMjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1zaXplPSIxNyIgZmlsbD0iIzAwYzhmZiI+UzwvdGV4dD4KPC9zdmc+">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StellarMonitor — Wallet Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#05080d;--panel:#0c1220;--panel2:#0f1628;--edge:rgba(255,255,255,0.07);--edge2:rgba(255,255,255,0.03);--cyan:#00c8ff;--green:#00e87a;--orange:#ff8c00;--red:#ff3d5a;--purple:#a78bfa;--white:#f0f4fa;--gray1:#8da0b8;--gray2:#4a6380;--mono:'DM Mono',monospace;--sans:'Outfit',sans-serif}
+html,body{background:var(--bg);color:var(--white);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(5,8,13,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--edge)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--white);font-weight:700;font-size:15px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+.nav-center{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:4px}
+.nav-link{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gray1);text-decoration:none;padding:7px 16px;border-radius:3px;transition:all .15s;border:1px solid transparent}
+.nav-link:hover{color:var(--white);background:rgba(255,255,255,.05);border-color:var(--edge)}
+.nav-link.active{color:var(--cyan);border-color:rgba(0,200,255,.3);background:rgba(0,200,255,.06)}
+.nav-cta{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:7px 18px;border:1px solid var(--cyan);color:var(--cyan);border-radius:3px;text-decoration:none;transition:all .15s}
+.nav-cta:hover{background:var(--cyan);color:var(--bg)}
+main{padding:80px 40px 40px;max-width:1200px;margin:0 auto}
+.page-header{margin-bottom:32px}
+.page-title{font-size:28px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:12px}
+.badge{font-size:11px;font-family:var(--mono);letter-spacing:1px;padding:3px 10px;border-radius:2px;background:rgba(255,140,0,.15);color:var(--orange);border:1px solid rgba(255,140,0,.3)}
+.page-sub{color:var(--gray1);font-size:14px}
+.search-box{display:flex;gap:10px;margin-bottom:32px}
+.addr-input{flex:1;background:var(--panel);border:1px solid var(--edge);border-radius:4px;padding:12px 16px;font-family:var(--mono);font-size:13px;color:var(--white);outline:none;transition:border-color .15s}
+.addr-input:focus{border-color:var(--cyan)}
+.addr-input::placeholder{color:var(--gray2)}
+.search-btn{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:12px 24px;background:var(--cyan);color:var(--bg);border:none;border-radius:4px;cursor:pointer;font-weight:600;transition:opacity .15s}
+.search-btn:hover{opacity:.85}
+.search-btn:disabled{opacity:.4;cursor:not-allowed}
+.result{display:none}
+.score-hero{background:var(--panel);border:1px solid var(--edge);border-radius:8px;padding:32px;margin-bottom:20px;display:flex;gap:32px;align-items:center}
+.score-ring{position:relative;width:140px;height:140px;flex-shrink:0}
+.score-ring canvas{position:absolute;top:0;left:0}
+.score-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.score-num{font-size:36px;font-weight:800;line-height:1}
+.score-emoji{font-size:20px;margin-bottom:4px}
+.score-info{flex:1}
+.score-addr{font-family:var(--mono);font-size:11px;color:var(--gray2);margin-bottom:8px;word-break:break-all}
+.score-cat{font-size:20px;font-weight:700;margin-bottom:4px;text-transform:capitalize}
+.score-desc{font-size:13px;color:var(--gray1);line-height:1.6}
+.score-flags{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.flag{font-family:var(--mono);font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:2px;text-transform:uppercase}
+.flag.exchange{background:rgba(0,200,255,.1);color:var(--cyan);border:1px solid rgba(0,200,255,.3)}
+.flag.bot{background:rgba(255,61,90,.1);color:var(--red);border:1px solid rgba(255,61,90,.3)}
+.flag.circular{background:rgba(255,140,0,.1);color:var(--orange);border:1px solid rgba(255,140,0,.3)}
+.breakdown{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.score-box{background:var(--panel);border:1px solid var(--edge);border-radius:6px;padding:16px 20px}
+.sb-label{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--gray2);margin-bottom:8px;text-transform:uppercase}
+.sb-bar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;margin-bottom:8px;overflow:hidden}
+.sb-fill{height:100%;border-radius:2px;transition:width .5s ease}
+.sb-val{font-size:20px;font-weight:700}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--panel);border:1px solid var(--edge);border-radius:6px;padding:16px 20px}
+.sc-label{font-family:var(--mono);font-size:9px;color:var(--gray2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.sc-val{font-size:18px;font-weight:600;color:var(--white)}
+.actions{display:flex;gap:10px}
+.action-btn{flex:1;font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:10px;border:1px solid var(--edge);border-radius:3px;color:var(--gray1);background:transparent;cursor:pointer;transition:all .15s;text-align:center;text-decoration:none;display:block}
+.action-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,200,255,.06)}
+.loading{display:none;text-align:center;padding:40px;color:var(--gray2);font-family:var(--mono);font-size:11px}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(0,200,255,.2);border-top-color:var(--cyan);border-radius:50%;animation:spin .7s linear infinite;margin-right:8px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error{display:none;padding:20px;text-align:center;color:var(--red);font-family:var(--mono);font-size:12px;background:rgba(255,61,90,.06);border:1px solid rgba(255,61,90,.2);border-radius:6px}
+.cat-legend{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:20px}
+.cat-card{background:var(--panel);border:1px solid var(--edge);border-radius:6px;padding:14px;text-align:center}
+.cat-emoji{font-size:24px;margin-bottom:6px}
+.cat-name{font-size:11px;font-weight:600;text-transform:capitalize;margin-bottom:2px}
+.cat-range{font-family:var(--mono);font-size:9px;color:var(--gray2)}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo"><div class="logo-dot"></div>StellarMonitor</a>
+  <div class="nav-center">
+    <a href="/feed"          class="nav-link">Live Feed</a>
+    <a href="/scanner"       class="nav-link">Scanner</a>
+    <a href="/graph"         class="nav-link">Graph</a>
+    <a href="/pools"         class="nav-link">Pools</a>
+    <a href="/soroban"       class="nav-link">Soroban</a>
+    <a href="/intelligence"  class="nav-link active">Intelligence</a>
+    <a href="/docs"          class="nav-link">Docs</a>
+  </div>
+  <div style="display:flex;gap:8px">
+    <a href="https://t.me/stellarmonitor" class="nav-cta" style="border-color:rgba(0,200,255,.4);background:rgba(0,200,255,.06)" target="_blank">Telegram ↗</a>
+    <a href="https://x.com/StellarMonitor" class="nav-cta" target="_blank">Follow ↗</a>
+  </div>
+</nav>
+
+<main>
+  <div class="page-header">
+    <div class="page-title">Wallet Intelligence <span class="badge">BETA</span></div>
+    <div class="page-sub">Behavioral scoring for any Stellar wallet — volume, patterns, Soroban activity</div>
+  </div>
+
+  <div class="search-box">
+    <input class="addr-input" id="addr" placeholder="Enter Stellar wallet address (G...)" maxlength="56">
+    <button class="search-btn" id="btn" onclick="analyze()">Analyze →</button>
+  </div>
+
+  <div class="loading" id="loading"><span class="spin"></span>Analyzing wallet behavior...</div>
+  <div class="error" id="error"></div>
+
+  <div class="result" id="result">
+    <!-- Score Hero -->
+    <div class="score-hero">
+      <div class="score-ring">
+        <canvas id="ring-canvas" width="140" height="140"></canvas>
+        <div class="score-center">
+          <div class="score-emoji" id="r-emoji">—</div>
+          <div class="score-num" id="r-score">—</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--gray2)">/ 100</div>
+        </div>
+      </div>
+      <div class="score-info">
+        <div class="score-addr" id="r-addr">—</div>
+        <div class="score-cat" id="r-cat">—</div>
+        <div class="score-desc" id="r-desc">—</div>
+        <div class="score-flags" id="r-flags"></div>
+      </div>
+    </div>
+
+    <!-- Score Breakdown -->
+    <div class="breakdown">
+      <div class="score-box">
+        <div class="sb-label">Volume Score</div>
+        <div class="sb-bar"><div class="sb-fill" id="bar-vol" style="background:var(--cyan);width:0%"></div></div>
+        <div class="sb-val" id="val-vol" style="color:var(--cyan)">—</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--gray2);margin-top:4px">/ 30 pts</div>
+      </div>
+      <div class="score-box">
+        <div class="sb-label">Behavior Score</div>
+        <div class="sb-bar"><div class="sb-fill" id="bar-beh" style="background:var(--green);width:0%"></div></div>
+        <div class="sb-val" id="val-beh" style="color:var(--green)">—</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--gray2);margin-top:4px">/ 40 pts</div>
+      </div>
+      <div class="score-box">
+        <div class="sb-label">Soroban Score</div>
+        <div class="sb-bar"><div class="sb-fill" id="bar-sor" style="background:var(--purple);width:0%"></div></div>
+        <div class="sb-val" id="val-sor" style="color:var(--purple)">—</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--gray2);margin-top:4px">/ 20 pts</div>
+      </div>
+      <div class="score-box">
+        <div class="sb-label">Network Score</div>
+        <div class="sb-bar"><div class="sb-fill" id="bar-net" style="background:var(--orange);width:0%"></div></div>
+        <div class="sb-val" id="val-net" style="color:var(--orange)">—</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--gray2);margin-top:4px">/ 10 pts</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card"><div class="sc-label">Total Volume</div><div class="sc-val" id="r-vol">—</div></div>
+      <div class="stat-card"><div class="sc-label">Transactions</div><div class="sc-val" id="r-txs">—</div></div>
+      <div class="stat-card"><div class="sc-label">Counterparties</div><div class="sc-val" id="r-cpty">—</div></div>
+      <div class="stat-card"><div class="sc-label">Large Txs (>$10K)</div><div class="sc-val" id="r-large">—</div></div>
+      <div class="stat-card"><div class="sc-label">Exchange Ratio</div><div class="sc-val" id="r-exch">—</div></div>
+      <div class="stat-card"><div class="sc-label">Circular Ratio</div><div class="sc-val" id="r-circ">—</div></div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <a class="action-btn" id="link-scanner" href="#" target="_blank">Open in Scanner →</a>
+      <a class="action-btn" id="link-graph" href="#" target="_blank">Open in Graph →</a>
+      <a class="action-btn" id="link-expert" href="#" target="_blank">View on Stellar Expert →</a>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div style="margin-top:40px">
+    <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--gray2);text-transform:uppercase;margin-bottom:12px">Score Categories</div>
+    <div class="cat-legend">
+      <div class="cat-card"><div class="cat-emoji">🐋</div><div class="cat-name">Whale</div><div class="cat-range">80–100</div></div>
+      <div class="cat-card"><div class="cat-emoji">🦈</div><div class="cat-name">Shark</div><div class="cat-range">60–79</div></div>
+      <div class="cat-card"><div class="cat-emoji">🐟</div><div class="cat-name">Trader</div><div class="cat-range">40–59</div></div>
+      <div class="cat-card"><div class="cat-emoji">🐠</div><div class="cat-name">Fish</div><div class="cat-range">20–39</div></div>
+      <div class="cat-card"><div class="cat-emoji">🦐</div><div class="cat-name">Shrimp</div><div class="cat-range">0–19</div></div>
+    </div>
+  </div>
+</main>
+
+<script>
+const API = 'https://api.stellarmonitor.xyz';
+
+function fU(n) {
+  if(!n&&n!==0)return '—';
+  const a=Math.abs(n),s=n<0?'-':'';
+  if(a>=1e9)return s+'$'+(a/1e9).toFixed(2)+'B';
+  if(a>=1e6)return s+'$'+(a/1e6).toFixed(2)+'M';
+  if(a>=1e3)return s+'$'+(a/1e3).toFixed(0)+'K';
+  return s+'$'+a.toFixed(2);
+}
+
+function drawRing(score, category) {
+  const canvas = document.getElementById('ring-canvas');
+  const ctx = canvas.getContext('2d');
+  const cx=70,cy=70,r=58,lw=10;
+  const colors = {whale:'#00c8ff',shark:'#00e87a',trader:'#a78bfa',fish:'#ff8c00',shrimp:'#4a6380',exchange:'#00c8ff',bot:'#ff3d5a'};
+  const color = colors[category]||'#00c8ff';
+  ctx.clearRect(0,0,140,140);
+  // Background ring
+  ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,Math.PI*1.5);
+  ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=lw;ctx.stroke();
+  // Score ring
+  const end = -Math.PI/2 + (score/100)*Math.PI*2;
+  ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,end);
+  ctx.strokeStyle=color;ctx.lineWidth=lw;
+  ctx.shadowColor=color;ctx.shadowBlur=12;
+  ctx.lineCap='round';ctx.stroke();
+  // Score color
+  document.getElementById('r-score').style.color=color;
+}
+
+const CAT_DESC = {
+  whale: 'Institutional or high-volume player. Moves significant capital regularly.',
+  shark: 'Active trader with substantial capital. Likely a sophisticated participant.',
+  trader: 'Regular participant with moderate activity. Active in the ecosystem.',
+  fish: 'Occasional participant. Light activity with limited counterparties.',
+  shrimp: 'New or low-activity wallet. Limited transaction history.',
+  exchange: 'Known exchange or custodial wallet. High volume, many counterparties.',
+  bot: 'Automated wallet detected. High circular ratio or regular timing patterns.',
+};
+
+async function analyze() {
+  const addr = document.getElementById('addr').value.trim();
+  if(!addr || addr.length !== 56 || !addr.startsWith('G')) {
+    document.getElementById('error').textContent='Please enter a valid Stellar address (56 chars, starts with G)';
+    document.getElementById('error').style.display='block';
+    return;
+  }
+  document.getElementById('error').style.display='none';
+  document.getElementById('result').style.display='none';
+  document.getElementById('loading').style.display='block';
+  document.getElementById('btn').disabled=true;
+
+  try {
+    const r = await fetch(`${API}/api/score/${addr}`);
+    const d = await r.json();
+    if(d.error) throw new Error(d.error);
+
+    // Fill UI
+    document.getElementById('r-emoji').textContent = d.emoji||'🦐';
+    document.getElementById('r-score').textContent = d.score||0;
+    document.getElementById('r-addr').textContent = addr;
+    document.getElementById('r-cat').textContent = (d.emoji||'')+'  '+(d.exchange_name||d.category||'Unknown');
+    document.getElementById('r-desc').textContent = CAT_DESC[d.category]||'';
+
+    // Flags
+    const flags = [];
+    if(d.is_exchange) flags.push('<span class="flag exchange">🏦 Exchange</span>');
+    if(d.is_bot) flags.push('<span class="flag bot">🤖 Bot Detected</span>');
+    if(d.circular_ratio > 0.3) flags.push('<span class="flag circular">⚠ High Circular</span>');
+    document.getElementById('r-flags').innerHTML = flags.join('');
+
+    // Bars
+    const setBar = (id, val, max) => {
+      document.getElementById('bar-'+id).style.width = Math.round(val/max*100)+'%';
+      document.getElementById('val-'+id).textContent = val;
+    };
+    setBar('vol', d.volume_score||0, 30);
+    setBar('beh', d.behavior_score||0, 40);
+    setBar('sor', d.soroban_score||0, 20);
+    setBar('net', d.network_score||0, 10);
+
+    // Stats
+    document.getElementById('r-vol').textContent = fU(d.total_volume_usd);
+    document.getElementById('r-txs').textContent = d.tx_count||0;
+    document.getElementById('r-cpty').textContent = d.counterparties||0;
+    document.getElementById('r-large').textContent = d.large_txs||0;
+    document.getElementById('r-exch').textContent = ((d.exchange_ratio||0)*100).toFixed(1)+'%';
+    document.getElementById('r-circ').textContent = ((d.circular_ratio||0)*100).toFixed(1)+'%';
+
+    // Links
+    document.getElementById('link-scanner').href = `/scanner?addr=${addr}`;
+    document.getElementById('link-graph').href = `/graph?addr=${addr}`;
+    document.getElementById('link-expert').href = `https://stellar.expert/explorer/public/account/${addr}`;
+
+    drawRing(d.score||0, d.category||'shrimp');
+
+    document.getElementById('result').style.display='block';
+  } catch(e) {
+    document.getElementById('error').textContent='Error: '+e.message;
+    document.getElementById('error').style.display='block';
+  } finally {
+    document.getElementById('loading').style.display='none';
+    document.getElementById('btn').disabled=false;
+  }
+}
+
+document.getElementById('addr').addEventListener('keydown', e => {
+  if(e.key==='Enter') analyze();
+});
+
+// Auto-load from URL param
+const p = new URLSearchParams(location.search);
+if(p.get('addr')) {
+  document.getElementById('addr').value = p.get('addr');
+  analyze();
+}
+</script>
+</body>
+</html>

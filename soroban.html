@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzAyMDQwYSIvPgogIDxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjEzIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMGM4ZmYiIHN0cm9rZS13aWR0aD0iMS41IiBvcGFjaXR5PSIwLjQiLz4KICA8dGV4dCB4PSIxNiIgeT0iMjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1zaXplPSIxNyIgZmlsbD0iIzAwYzhmZiI+UzwvdGV4dD4KPC9zdmc+">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StellarMonitor — Soroban</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#05080d;--panel:#0c1220;--panel2:#0f1628;--edge:rgba(255,255,255,0.07);--edge2:rgba(255,255,255,0.03);--cyan:#00c8ff;--green:#00e87a;--orange:#ff8c00;--red:#ff3d5a;--purple:#a78bfa;--white:#f0f4fa;--gray1:#8da0b8;--gray2:#4a6380;--mono:'DM Mono',monospace;--sans:'Outfit',sans-serif}
+html,body{height:100%;background:var(--bg);color:var(--white);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(5,8,13,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--edge)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--white);font-weight:700;font-size:15px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+.nav-center{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:4px}
+.nav-link{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gray1);text-decoration:none;padding:7px 16px;border-radius:3px;transition:all .15s;border:1px solid transparent}
+.nav-link:hover{color:var(--white);background:rgba(255,255,255,.05);border-color:var(--edge)}
+.nav-link.active{color:var(--cyan);border-color:rgba(0,200,255,.3);background:rgba(0,200,255,.06)}
+.nav-cta{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:7px 18px;border:1px solid var(--cyan);color:var(--cyan);border-radius:3px;text-decoration:none;transition:all .15s}
+.nav-cta:hover{background:var(--cyan);color:var(--bg)}
+main{padding:80px 40px 40px;max-width:1400px;margin:0 auto}
+.page-header{margin-bottom:32px}
+.page-title{font-size:28px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:12px}
+.page-title .badge{font-size:11px;font-family:var(--mono);letter-spacing:1px;padding:3px 10px;border-radius:2px;background:rgba(167,139,250,.15);color:var(--purple);border:1px solid rgba(167,139,250,.3)}
+.page-sub{color:var(--gray1);font-size:14px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.stat-box{background:var(--panel);border:1px solid var(--edge);border-radius:6px;padding:16px 20px}
+.stat-label{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray2);margin-bottom:6px}
+.stat-val{font-size:22px;font-weight:700;color:var(--white)}
+.stat-val.cyan{color:var(--cyan)}.stat-val.green{color:var(--green)}.stat-val.purple{color:var(--purple)}.stat-val.orange{color:var(--orange)}
+.toolbar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.chip{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:5px 12px;border:1px solid var(--edge);border-radius:2px;cursor:pointer;color:var(--gray1);background:transparent;transition:all .15s}
+.chip:hover{color:var(--white);border-color:rgba(255,255,255,.2)}
+.chip.on{border-color:var(--cyan);color:var(--cyan);background:rgba(0,200,255,.08)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;display:inline-block;margin-right:4px}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,232,122,.4)}50%{opacity:.7;box-shadow:0 0 0 6px rgba(0,232,122,0)}}
+.events-list{background:var(--panel);border:1px solid var(--edge);border-radius:6px;overflow:hidden}
+.events-hdr{display:grid;grid-template-columns:120px 140px 1fr 110px 80px;padding:10px 20px;background:var(--panel2);border-bottom:1px solid var(--edge);font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray2)}
+.event-row{display:grid;grid-template-columns:120px 140px 1fr 110px 80px;padding:12px 20px;border-bottom:1px solid var(--edge2);transition:background .1s;cursor:pointer;column-gap:12px}
+.event-row:hover{background:rgba(0,200,255,.03)}
+.event-row:last-child{border-bottom:none}
+.event-type{font-family:var(--mono);font-size:10px;font-weight:500}
+.pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:2px;font-family:var(--mono);font-size:9px;letter-spacing:.5px;font-weight:500;text-transform:uppercase}
+.pill.swap{background:rgba(0,200,255,.12);color:var(--cyan)}
+.pill.deposit{background:rgba(0,232,122,.12);color:var(--green)}
+.pill.withdraw{background:rgba(255,61,90,.12);color:var(--red)}
+.pill.pool{background:rgba(167,139,250,.12);color:var(--purple)}
+.pill.unknown{background:rgba(74,99,128,.15);color:var(--gray2)}
+.contract-name{font-size:12px;color:var(--cyan);font-weight:500}
+.event-desc{font-size:11px;color:var(--gray1)}
+.event-usd{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--white);text-align:right}
+.event-time{font-family:var(--mono);font-size:10px;color:var(--gray2);text-align:right}
+.empty{padding:60px;text-align:center;color:var(--gray2);font-family:var(--mono);font-size:11px}
+.contracts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+.contract-card{background:var(--panel);border:1px solid var(--edge);border-radius:6px;padding:16px 20px;transition:border-color .15s}
+.contract-card:hover{border-color:rgba(167,139,250,.3)}
+.cc-name{font-size:14px;font-weight:600;margin-bottom:4px;color:var(--white)}
+.cc-addr{font-family:var(--mono);font-size:9px;color:var(--gray2);margin-bottom:10px}
+.cc-stats{display:flex;gap:16px}
+.cc-stat{font-family:var(--mono);font-size:10px;color:var(--gray2)}
+.cc-stat span{color:var(--white);font-weight:500}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo"><div class="logo-dot"></div>StellarMonitor</a>
+  <div class="nav-center">
+    <a href="/feed"       class="nav-link">Live Feed</a>
+    <a href="/scanner"    class="nav-link">Scanner</a>
+    <a href="/graph"      class="nav-link">Graph</a>
+    <a href="/pools"      class="nav-link">Pools</a>
+    <a href="/soroban"    class="nav-link active">Soroban</a>
+    <a href="/intelligence" class="nav-link">Intelligence</a>
+    <a href="/docs"       class="nav-link">Docs</a>
+  </div>
+  <div style="display:flex;gap:8px">
+    <a href="https://t.me/stellarmonitor" class="nav-cta" style="border-color:rgba(0,200,255,.4);background:rgba(0,200,255,.06)" target="_blank">Telegram ↗</a>
+    <a href="https://x.com/StellarMonitor" class="nav-cta" target="_blank">Follow ↗</a>
+  </div>
+</nav>
+
+<main>
+  <div class="page-header">
+    <div class="page-title">
+      Soroban Monitor
+      <span class="badge">SMART CONTRACTS</span>
+      <span style="font-size:13px;font-family:var(--mono);color:var(--green);font-weight:400"><span class="live-dot"></span>Live</span>
+    </div>
+    <div class="page-sub">Real-time Soroban smart contract events — swaps, liquidity, new pools</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row" id="stats-row">
+    <div class="stat-box"><div class="stat-label">24h Swaps</div><div class="stat-val cyan" id="s-swaps">—</div></div>
+    <div class="stat-box"><div class="stat-label">24h Deposits</div><div class="stat-val green" id="s-deposits">—</div></div>
+    <div class="stat-box"><div class="stat-label">24h Volume</div><div class="stat-val purple" id="s-volume">—</div></div>
+    <div class="stat-box"><div class="stat-label">Active Contracts</div><div class="stat-val orange" id="s-contracts">—</div></div>
+  </div>
+
+  <!-- Known Contracts -->
+  <div class="contracts-grid" id="contracts-grid">
+    <div class="contract-card">
+      <div class="cc-name">🌊 Aquarius AMM</div>
+      <div class="cc-addr">CBQDHNBFBZYE4MKPWBSJOPIYLW4SFSXAXUTSXJN76GNKYVYPCKWC6QUK</div>
+      <div class="cc-stats"><div class="cc-stat">Status: <span style="color:var(--green)">Active</span></div><div class="cc-stat">Type: <span>AMM</span></div></div>
+    </div>
+    <div class="contract-card">
+      <div class="cc-name">🔄 Soroswap</div>
+      <div class="cc-addr">CAGJZSZ4A7RQKAVUBVSPJTCJPNQ3Y4M7NB3LNFUOUQXAZLPTJL37TOF</div>
+      <div class="cc-stats"><div class="cc-stat">Status: <span style="color:var(--green)">Active</span></div><div class="cc-stat">Type: <span>DEX</span></div></div>
+    </div>
+    <div class="contract-card">
+      <div class="cc-name">💰 Blend Protocol</div>
+      <div class="cc-addr">CDVQVKOY2YSXS2IC7KN6MNASSHPAO7UN2UR2ON4OI2SKMFJNVAMDX6DP</div>
+      <div class="cc-stats"><div class="cc-stat">Status: <span style="color:var(--green)">Active</span></div><div class="cc-stat">Type: <span>Lending</span></div></div>
+    </div>
+  </div>
+
+  <!-- Filter toolbar -->
+  <div class="toolbar">
+    <span style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--gray2);text-transform:uppercase">Filter</span>
+    <span class="chip on"  onclick="setFilter(this,'')">All</span>
+    <span class="chip"     onclick="setFilter(this,'SWAP')">Swaps</span>
+    <span class="chip"     onclick="setFilter(this,'LIQUIDITY_DEPOSIT')">Deposits</span>
+    <span class="chip"     onclick="setFilter(this,'LIQUIDITY_WITHDRAW')">Withdrawals</span>
+    <span class="chip"     onclick="setFilter(this,'NEW_POOL')">New Pools</span>
+  </div>
+
+  <!-- Events list -->
+  <div class="events-list">
+    <div class="events-hdr">
+      <div>Type</div>
+      <div>Contract</div>
+      <div>Description</div>
+      <div style="text-align:right">Value</div>
+      <div style="text-align:right">Time</div>
+    </div>
+    <div id="events-body"><div class="empty">Loading Soroban events...</div></div>
+  </div>
+</main>
+
+<script>
+const API = 'https://api.stellarmonitor.xyz';
+let filterType = '';
+let _dateTip = null;
+
+function fU(n) {
+  if(!n) return '—';
+  const a=Math.abs(n),s=n<0?'-':'';
+  if(a>=1e9)return s+'$'+(a/1e9).toFixed(2)+'B';
+  if(a>=1e6)return s+'$'+(a/1e6).toFixed(2)+'M';
+  if(a>=1e3)return s+'$'+(a/1e3).toFixed(0)+'K';
+  return s+'$'+a.toFixed(0);
+}
+
+function ago(ts) {
+  const s=Math.floor((Date.now()-new Date(ts))/1000);
+  if(s<60)return s+'s ago';
+  if(s<3600)return Math.floor(s/60)+'m ago';
+  if(s<86400)return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
+}
+
+function showDateTip(e,ts){
+  if(!_dateTip){_dateTip=document.createElement('div');_dateTip.style.cssText='position:fixed;background:rgba(2,4,10,0.97);border:1px solid rgba(0,200,255,0.3);padding:5px 10px;border-radius:3px;font-family:monospace;font-size:11px;color:#f0f4fa;pointer-events:none;z-index:99999;white-space:nowrap';document.body.appendChild(_dateTip);}
+  const d=new Date(ts);
+  _dateTip.textContent=d.toLocaleString('en',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+' UTC';
+  _dateTip.style.display='block';_dateTip.style.left=(e.clientX+12)+'px';_dateTip.style.top=(e.clientY-30)+'px';
+}
+function hideDateTip(){if(_dateTip)_dateTip.style.display='none';}
+
+function pillHtml(type) {
+  const map = {
+    'SWAP': ['swap','⇄ Swap'],
+    'LIQUIDITY_DEPOSIT': ['deposit','↓ Deposit'],
+    'LIQUIDITY_WITHDRAW': ['withdraw','↑ Withdraw'],
+    'NEW_POOL': ['pool','✦ New Pool'],
+  };
+  const [cls, label] = map[type] || ['unknown', type];
+  return `<span class="pill ${cls}">${label}</span>`;
+}
+
+function setFilter(el, type) {
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  filterType = type;
+  fetchEvents();
+}
+
+async function fetchStats() {
+  try {
+    const r = await fetch(`${API}/api/soroban/stats`);
+    const d = await r.json();
+    document.getElementById('s-swaps').textContent = d.swaps || 0;
+    document.getElementById('s-deposits').textContent = d.deposits || 0;
+    document.getElementById('s-volume').textContent = fU(d.total_volume_usd || 0);
+    document.getElementById('s-contracts').textContent = d.contracts_active || 0;
+  } catch(e) {}
+}
+
+async function fetchEvents() {
+  try {
+    let url = `${API}/api/soroban?limit=50`;
+    if(filterType) url += `&type=${filterType}`;
+    const r = await fetch(url);
+    const d = await r.json();
+    const body = document.getElementById('events-body');
+    const events = d.events || [];
+
+    if(!events.length) {
+      body.innerHTML = '<div class="empty">No Soroban events yet — monitoring active contracts in real time</div>';
+      return;
+    }
+
+    body.innerHTML = events.map(e => {
+      const desc = e.action
+        ? `${e.action} via ${e.contract_name || 'Unknown'}`
+        : (e.contract_name ? `Event on ${e.contract_name}` : 'Smart contract interaction');
+      const link = e.tx_hash
+        ? `https://stellar.expert/explorer/public/tx/${e.tx_hash}`
+        : '#';
+      return `<div class="event-row" onclick="window.open('${link}','_blank')">
+        <div>${pillHtml(e.event_type)}</div>
+        <div class="contract-name">${e.contract_name||e.contract_id?.slice(0,8)+'...'||'—'}</div>
+        <div class="event-desc">${desc}</div>
+        <div class="event-usd">${fU(e.amount_usd)}</div>
+        <div class="event-time" onmouseenter="showDateTip(event,'${e.created_at}')" onmouseleave="hideDateTip()">${ago(e.created_at)}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    document.getElementById('events-body').innerHTML = '<div class="empty">Error loading events</div>';
+  }
+}
+
+fetchStats();
+fetchEvents();
+setInterval(fetchEvents, 5000);
+setInterval(fetchStats, 30000);
+</script>
+</body>
+</html>

@@ -125,7 +125,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;ali
     <div class="wp-head">
       <div>
         <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray2);margin-bottom:4px">Wallet Profile</div>
-        <div class="wp-addr" id="wp-addr">—</div>
+        <div style="display:flex;align-items:center;gap:12px">
+      <div class="wp-addr" id="wp-addr">—</div>
+      <div id="wp-score-badge" style="display:none;font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:2px;border:1px solid rgba(255,255,255,.15);cursor:pointer" onclick="openIntelligence()">—</div>
+    </div>
         <div class="wp-meta">
           <div class="wp-mi"><div class="wp-ml">Created</div><div class="wp-mv" id="wp-created">—</div></div>
           <div class="wp-mi"><div class="wp-ml">Last tx</div><div class="wp-mv" id="wp-last">—</div></div>
@@ -549,6 +552,7 @@ async function loadWalletProfile(addr){
     if(hr.ok){
       const hd=await hr.json();const ops=hd?._embedded?.records||[];
       if(ops.length)$('wp-last').textContent=ago(ops[0].created_at);
+    fetchWalletScore(addr);
       let tin=0,tout=0,lar=0;const cps=new Set();let excnt=0;const dIn={},dOut={};
       ops.forEach(op=>{
         if(op.type!=='payment')return;
@@ -705,6 +709,29 @@ function showDateTip(e,ts){
   _dateTip.style.display='block';_dateTip.style.left=(e.clientX+12)+'px';_dateTip.style.top=(e.clientY-30)+'px';
 }
 function hideDateTip(){if(_dateTip)_dateTip.style.display='none';}
+
+// Wallet Intelligence Score
+const SCORE_COLORS = {whale:'#00c8ff',shark:'#00e87a',trader:'#a78bfa',fish:'#ff8c00',shrimp:'#4a6380',exchange:'#00c8ff',bot:'#ff3d5a'};
+async function fetchWalletScore(addr) {
+  const badge = document.getElementById('wp-score-badge');
+  if(!badge) return;
+  badge.style.display='none';
+  try {
+    const r = await fetch('https://api.stellarmonitor.xyz/api/score/'+addr);
+    const d = await r.json();
+    if(d.score !== undefined) {
+      const color = SCORE_COLORS[d.category]||'#8da0b8';
+      badge.textContent = (d.emoji||'')+'  '+d.score+'/100 · '+(d.exchange_name||d.category);
+      badge.style.borderColor = color+'66';
+      badge.style.color = color;
+      badge.style.display='block';
+    }
+  } catch(e) {}
+}
+function openIntelligence() {
+  const addr = document.getElementById('scan-addr')?.value?.trim();
+  if(addr) window.open('/intelligence?addr='+addr,'_blank');
+}
 
 // Auto-load from URL param
 const p=new URLSearchParams(location.search);const pa=p.get('addr');
