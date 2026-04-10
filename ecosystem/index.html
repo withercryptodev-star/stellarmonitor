@@ -230,8 +230,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;height:56px;display:flex;ali
         <button class="sort-btn" data-sort="users">↓ Users</button>
       </div>
     </div>
-    
-    
+  </aside>
+
+  <main class="main">
+    <div class="toolbar">
+      <div class="page-title">Ecosystem</div>
+      <div class="result-count" id="result-count"></div>
+      <div class="toolbar-spacer"></div>
+      <div class="vt-wrap">
+        <span class="vt-lbl">View</span>
+        <button class="vt-btn active" id="btn-grid" onclick="setView('grid')">⊞ Grid</button>
+        <button class="vt-btn" id="btn-table" onclick="setView('table')">≡ Table</button>
+      </div>
+    </div>
     <div id="grid-view"></div>
     <div id="table-view">
       <div class="table-wrap">
