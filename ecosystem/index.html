@@ -481,9 +481,9 @@ function render(){
   renderStats(list);
   renderCats();
   document.querySelectorAll('.sort-btn').forEach(b=>b.classList.toggle('active',b.dataset.sort===S.sort));
-  
-
-
+  document.querySelectorAll('.sort-btn').forEach(b=>b.addEventListener('click',()=>{S.sort=b.dataset.sort;render();}));
+  S.view==='grid'?renderGrid(list):renderTable(list);
+}
 
 // Keyboard accessibility for cards
 document.addEventListener('keydown',e=>{
