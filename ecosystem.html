@@ -227,8 +227,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;height:56px;display:flex;ali
       <div class="sort-btns">
                 <button class="sort-btn active" data-sort="tvl">↓ TVL</button>
         <button class="sort-btn" data-sort="launched">↓ Newest First</button>
-  document.querySelectorAll(".sort-btn").forEach(b=>b.addEventListener("click",()=>{S.sort=b.dataset.sort;render();}));
-}
+        <button class="sort-btn" data-sort="users">↓ Users</button>
       </div>
     </div>
     
