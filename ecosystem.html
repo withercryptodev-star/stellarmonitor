@@ -372,12 +372,14 @@ const FAVICON_OVERRIDE={
   'decaf.so':'https://logo.clearbit.com/decaf.so',
   'phoenix-hub.io':'https://www.phoenix-hub.io/favicon.ico',
 };
-function getFavicon(p){
+function getFaviconHtml(p,size){
   try{
     const host=new URL(p.url).hostname;
-    if(FAVICON_OVERRIDE[host]) return FAVICON_OVERRIDE[host];
-    return 'https://www.google.com/s2/favicons?domain='+host+'&sz=64';
-  }catch{return '';}
+    if(FAVICON_OVERRIDE[host]){
+      return '<img src="'+FAVICON_OVERRIDE[host]+'" width="'+size+'" height="'+size+'" style="border-radius:'+(size===28?'6':'4')+'px;object-fit:cover" alt="">';
+    }
+    return '<img src="https://www.google.com/s2/favicons?domain='+host+'&sz=64" width="'+size+'" height="'+size+'" style="border-radius:'+(size===28?'6':'4')+'px;object-fit:cover" onerror="this.style.display=\'none\';this.nextSibling.style.display=\'block\'" alt=""><span style="display:none;font-size:'+(size===28?'17':'13')+'px">'+esc(p.icon)+'</span>';
+  }catch{return '<span style="font-size:'+(size===28?'17':'13')+'px">'+esc(p.icon)+'</span>';}
 }
 
 // ─── GRID render ─────────────────────────────────────────────────────────────
