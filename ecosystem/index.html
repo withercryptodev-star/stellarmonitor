@@ -118,7 +118,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;height:56px;display:flex;ali
 .b-beta{background:rgba(251,191,36,.1);color:var(--yellow);border:1px solid rgba(251,191,36,.3)}
 .b-new{background:rgba(167,139,250,.12);color:var(--purple);border:1px solid rgba(167,139,250,.3)}
 .b-audit{background:rgba(0,200,255,.08);color:var(--cyan);border:1px solid rgba(0,200,255,.2)}
-.b-verified{background:rgba(0,232,122,.12);color:var(--green);border:1px solid rgba(0,232,122,.4)}
+.b-verified{background:rgba(0,232,122,.12);color:var(--green);border:1px solid rgba(0,232,122,.4);position:relative;cursor:help}
+.b-verified::after{content:attr(title);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:rgba(2,4,10,.97);color:#f0f4fa;font-family:'DM Mono',monospace;font-size:10px;white-space:nowrap;padding:5px 10px;border-radius:3px;border:1px solid rgba(0,200,255,.3);pointer-events:none;opacity:0;transition:opacity .15s;z-index:9999}
+.b-verified:hover::after{opacity:1}
 .b-trusted{background:rgba(0,200,255,.08);color:var(--cyan);border:1px solid rgba(0,200,255,.2)}
 .b-caution{background:rgba(255,140,0,.1);color:var(--orange);border:1px solid rgba(255,140,0,.3)}
 
@@ -354,7 +356,7 @@ function applyFilters(){
 // ─── Badge html ──────────────────────────────────────────────────────────────
 function badges(p){
   let h=p.status==='live'?'<span class="badge b-live">Live</span>':p.status==='beta'?'<span class="badge b-beta">Beta</span>':'<span class="badge b-new">New</span>';
-  if(p.trust==='verified') h+='<span class="badge b-verified" title="Followed and endorsed by @StellarOrg on Twitter">✓ Verified</span>';
+  if(p.trust==='verified') h+='<span class="badge b-verified" title="Followed by @StellarOrg or @BuildOnStellar on Twitter">✓ Verified</span>';
   else if(p.audited) h+='<span class="badge b-audit">Audited</span>';
   else if(p.trust==='caution') h+='<span class="badge b-caution">⚠ Caution</span>';
   return h;
