@@ -381,8 +381,8 @@ function renderGrid(list){
     const metrics=m.slice(0,2).join('');
 
     // Social buttons inside card
-    const twBtn=p.tw?`<a href="${safeUrl(p.tw)}" class="soc-btn tw" target="_blank" rel="noopener" title="Twitter/X">${X_SVG}</a>`:'';
-    const dcBtn=p.dc?`<a href="${safeUrl(p.dc)}" class="soc-btn dc" target="_blank" rel="noopener" title="Discord">${DC_SVG}</a>`:'';
+    const twBtn=p.tw?`<a href="${safeUrl(p.tw)}" class="soc-btn tw" target="_blank" rel="noopener" title="Twitter/X" onclick="event.stopPropagation()">${X_SVG}</a>`:'';
+    const dcBtn=p.dc?`<a href="${safeUrl(p.dc)}" class="soc-btn dc" target="_blank" rel="noopener" title="Discord" onclick="event.stopPropagation()">${DC_SVG}</a>`:'';
 
     html+=`<div class="project-card" onclick="window.open('${safeUrl(p.url)}','_blank','noopener')" role="link" tabindex="0" aria-label="${esc(p.name)}">
   <div class="card-top"><div class="card-logo">${esc(p.icon)}</div><div class="card-badges">${badges(p)}</div></div>
@@ -392,7 +392,7 @@ function renderGrid(list){
   ${metrics?`<div class="card-metrics">${metrics}</div>`:''}
   <div class="card-footer">
     <div class="card-socials">${twBtn}${dcBtn}</div>
-    <a href="${safeUrl(p.url)}" class="card-site" target="_blank" rel="noopener" title="Website">
+    <a href="${safeUrl(p.url)}" class="card-site" target="_blank" rel="noopener" title="Website" onclick="event.stopPropagation()">
       <span class="chain-dot"></span>Visit ↗
     </a>
   </div>
@@ -499,6 +499,15 @@ function render(){
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&e.target.classList.contains('project-card')) e.target.click();
 });
+
+function setView(v){
+  S.view=v;
+  document.getElementById('grid-view').style.display=v==='grid'?'grid':'none';
+  document.getElementById('table-view').style.display=v==='table'?'block':'none';
+  document.getElementById('btn-grid').classList.toggle('active',v==='grid');
+  document.getElementById('btn-table').classList.toggle('active',v==='table');
+  render();
+}
 
 render();
 setView('grid');
