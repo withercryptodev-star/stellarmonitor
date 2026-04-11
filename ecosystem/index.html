@@ -411,8 +411,8 @@ function renderTable(list){
     const siteLink=`<a href="${safeUrl(p.url)}" class="tr-link-btn site" target="_blank" rel="noopener">${SITE_SVG} Website</a>`;
     const st=p.status==='live'?'<span class="badge b-live">Live</span>':p.status==='beta'?'<span class="badge b-beta">Beta</span>':'<span class="badge b-new">New</span>';
     return `<div id="trw-${esc(p.id)}">
-  <div class="tr-main">
-    <button class="tr-expand-btn" id="btn-${esc(p.id)}" onclick="toggleRow('${esc(p.id)}')" title="Show links">▶</button>
+  <div class="tr-main" onclick="toggleRow('${esc(p.id)}')">
+    <button class="tr-expand-btn" id="btn-${esc(p.id)}" onclick="event.stopPropagation();toggleRow('${esc(p.id)}')" title="Show links">▶</button>
     <div class="tr-num">${i+1}</div>
     <div class="tr-name-wrap">
       <div class="tr-logo">${esc(p.icon)}</div>
