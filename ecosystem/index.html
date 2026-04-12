@@ -185,6 +185,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;height:56px;display:flex;ali
 
 /* Global tooltip */
 #g-tip{position:fixed;background:rgba(2,4,10,0.97);color:#f0f4fa;font-family:'DM Mono',monospace;font-size:10px;padding:5px 10px;border-radius:3px;border:1px solid rgba(0,232,122,.4);pointer-events:none;z-index:999999;white-space:nowrap;display:none;transform:translateX(-50%)}
+
+/* Category pills on cards */
+.cat-pill{display:inline-flex;align-items:center;gap:3px;font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:.5px;padding:2px 6px;border-radius:2px;border:1px solid rgba(0,200,255,.25);color:var(--cyan);background:rgba(0,200,255,.06);margin-right:3px}
 </style>
 </head>
 <body>
@@ -269,6 +272,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;height:56px;display:flex;ali
 // ─── Security ───────────────────────────────────────────────────────────────
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
 function safeUrl(u){if(!u)return '#';try{const p=new URL(u);return p.protocol==='https:'?esc(u):'#';}catch{return '#';}}
+
+function catPills(cats){
+  return cats.map(c=>'<span class="cat-pill">'+esc(c)+'</span>').join('');
+}
 function fU(n){if(!n&&n!==0)return'—';const a=Math.abs(n),s=n<0?'-':'';if(a>=1e9)return s+'$'+(a/1e9).toFixed(2)+'B';if(a>=1e6)return s+'$'+(a/1e6).toFixed(2)+'M';if(a>=1e3)return s+'$'+(a/1e3).toFixed(0)+'K';return s+'$'+a.toFixed(0);}
 function fN(n){if(!n)return'—';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(0)+'K';return String(n);}
 
@@ -420,7 +427,7 @@ function renderGrid(list){
     html+=`<div class="project-card" onclick="window.open('${safeUrl(p.url)}','_blank','noopener')" role="link" tabindex="0" aria-label="${esc(p.name)}">
   <div class="card-top"><div class="card-logo">${getFaviconHtml(p,28)}</div><div class="card-badges">${badges(p)}</div></div>
   <div class="card-name">${esc(p.name)}</div>
-  <div class="card-cat">${esc(p.cat)}</div>
+  <div class="card-cat">${catPills(p.cats||[p.cat])}</div>
   <div class="card-desc">${esc(p.desc)}</div>
   ${metrics?`<div class="card-metrics">${metrics}</div>`:''}
   <div class="card-footer">
