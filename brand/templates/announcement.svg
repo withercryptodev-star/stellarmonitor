@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="628" viewBox="0 0 1200 628">
+  <rect width="1200" height="628" fill="#050a12"/>
+  <rect x="70" y="70" width="4" height="488" rx="2" fill="#00c8ff" opacity="0.5"/>
+  <circle cx="118" cy="100" r="20" fill="none" stroke="#00c8ff" stroke-width="1.4" stroke-opacity="0.5"/>
+  <circle cx="118" cy="100" r="6" fill="#00c8ff" opacity="0.7"/>
+  <text x="155" y="93" font-family="DM Mono, monospace" font-size="14" fill="#4a6380" letter-spacing="4">STELLAR</text>
+  <text x="155" y="114" font-family="DM Mono, monospace" font-size="14" fill="#00c8ff" letter-spacing="4">MONITOR</text>
+  <text x="82" y="220" font-family="DM Mono, monospace" font-size="18" fill="#00e87a" letter-spacing="3">UPDATE</text>
+  <text x="74" y="320" font-family="Outfit, sans-serif" font-size="64" font-weight="800" fill="#e8f0fa" letter-spacing="-2">Your headline</text>
+  <text x="74" y="395" font-family="Outfit, sans-serif" font-size="64" font-weight="800" fill="#00c8ff" letter-spacing="-2">goes here.</text>
+  <text x="78" y="465" font-family="Outfit, sans-serif" font-size="22" fill="#8da0b8" letter-spacing="-0.5">Subtitle or short description of what is new.</text>
+  <text x="78" y="583" font-family="DM Mono, monospace" font-size="16" fill="#2a3d52" letter-spacing="1.8">stellarmonitor.xyz</text>
+</svg>

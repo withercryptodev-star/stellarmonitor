@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <rect width="1080" height="1080" fill="#050a12"/>
+  <rect x="90" y="320" width="4" height="420" rx="2" fill="#00c8ff" opacity="0.5"/>
+  <circle cx="143" cy="348" r="27" fill="none" stroke="#00c8ff" stroke-width="1.6" stroke-opacity="0.5"/>
+  <circle cx="143" cy="348" r="9" fill="#00c8ff" opacity="0.7"/>
+  <text x="195" y="340" font-family="DM Mono, monospace" font-size="19" fill="#4a6380" letter-spacing="5">STELLAR</text>
+  <text x="195" y="367" font-family="DM Mono, monospace" font-size="19" fill="#00c8ff" letter-spacing="5">MONITOR</text>
+  <text x="100" y="550" font-family="Outfit, sans-serif" font-size="100" font-weight="800" fill="#e8f0fa" letter-spacing="-3.3">On-chain.</text>
+  <text x="100" y="660" font-family="Outfit, sans-serif" font-size="100" font-weight="800" fill="#00c8ff" letter-spacing="-3.3">Real-time.</text>
+  <text x="104" y="720" font-family="DM Mono, monospace" font-size="22" fill="#3d5268" letter-spacing="3">STELLAR NETWORK INTELLIGENCE</text>
+  <text x="104" y="1005" font-family="DM Mono, monospace" font-size="22" fill="#2a3d52" letter-spacing="2">stellarmonitor.xyz</text>
+</svg>
