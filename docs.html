@@ -27,15 +27,9 @@ body{
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
 
 /* NAV */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  height:56px;display:flex;align-items:center;justify-content:space-between;
-  padding:0 40px;
-  background:rgba(5,8,13,0.92);backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--edge);
-}
-.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--white);font-weight:700;font-size:15px;font-family:'Outfit',sans-serif}
-.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:rgba(5,8,13,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--edge)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--white);font-weight:700;font-size:15px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
 .nav-center{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:1px;white-space:nowrap}
 .nav-link{
   font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;
