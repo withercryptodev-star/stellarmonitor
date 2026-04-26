@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>News Admin — StellarMonitor</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05080d;--bg2:#0c1220;--panel:#0c1220;--edge:#1a2840;
+  --cyan:#00c8ff;--green:#00e87a;--purple:#a78bfa;--amber:#fbbf24;--red:#ff3d5a;
+  --white:#f0f4fa;--gray1:#8da0b8;--gray2:#4a6380;--gray3:#3d5268;
+}
+body{background:var(--bg);color:var(--white);font-family:'Outfit',system-ui,sans-serif;font-size:14px;line-height:1.5;min-height:100vh;padding:24px}
+.wrap{max-width:880px;margin:0 auto}
+
+.head{display:flex;align-items:center;justify-content:space-between;padding-bottom:18px;border-bottom:1px solid var(--edge);margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.head h1{font-size:24px;font-weight:500}
+.head-tag{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--amber);padding:4px 10px;border:1px solid var(--amber);border-radius:3px;text-transform:uppercase}
+.head-links a{color:var(--gray1);font-size:13px;margin-left:18px}
+.head-links a:hover{color:var(--cyan)}
+
+.token-bar{background:var(--bg2);border:1px solid var(--edge);border-radius:6px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.token-bar label{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--gray2);text-transform:uppercase}
+.token-bar input{flex:1;min-width:220px;background:none;border:1px solid var(--edge);border-radius:4px;padding:8px 12px;color:var(--white);font-family:'DM Mono',monospace;font-size:12px;outline:none}
+.token-bar input:focus{border-color:var(--cyan)}
+.token-status{font-size:11px;font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase}
+.token-status.ok{color:var(--green)}
+.token-status.bad{color:var(--red)}
+
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--edge);margin-bottom:24px}
+.tab-btn{padding:12px 20px;background:none;border:none;color:var(--gray1);font-family:inherit;font-size:14px;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab-btn:hover{color:var(--white)}
+.tab-btn.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+
+.panel{background:var(--bg2);border:1px solid var(--edge);border-radius:8px;padding:24px}
+.panel h2{font-size:16px;font-weight:500;margin-bottom:6px}
+.panel-sub{color:var(--gray1);font-size:13px;margin-bottom:20px}
+
+.row{margin-bottom:14px}
+.row label{display:block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;color:var(--gray2);text-transform:uppercase;margin-bottom:6px}
+.row input,.row textarea,.row select{width:100%;background:var(--bg);border:1px solid var(--edge);border-radius:4px;padding:10px 12px;color:var(--white);font-family:inherit;font-size:13px;outline:none;transition:border-color .15s}
+.row input:focus,.row textarea:focus,.row select:focus{border-color:var(--cyan)}
+.row textarea{min-height:90px;resize:vertical;font-family:'DM Mono',monospace;font-size:12px;line-height:1.6}
+.row-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.row-hint{font-size:11px;color:var(--gray3);margin-top:4px}
+
+.btn{padding:10px 18px;border:1px solid var(--cyan);background:rgba(0,200,255,.1);color:var(--cyan);border-radius:4px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
+.btn:hover:not(:disabled){background:rgba(0,200,255,.2)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-row{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.btn-secondary{border-color:var(--edge);background:none;color:var(--gray1)}
+.btn-secondary:hover:not(:disabled){border-color:var(--gray2);color:var(--white);background:rgba(141,160,184,.06)}
+.btn-danger{border-color:var(--red);color:var(--red);background:rgba(255,61,90,.08)}
+.btn-danger:hover:not(:disabled){background:rgba(255,61,90,.18)}
+
+.alert{padding:10px 14px;border-radius:4px;font-size:12px;margin-top:14px;font-family:'DM Mono',monospace}
+.alert.ok{background:rgba(0,232,122,.1);color:var(--green);border:1px solid rgba(0,232,122,.3)}
+.alert.err{background:rgba(255,61,90,.1);color:var(--red);border:1px solid rgba(255,61,90,.3)}
+.alert.info{background:rgba(0,200,255,.08);color:var(--cyan);border:1px solid rgba(0,200,255,.25)}
+
+.preview{margin-top:18px;padding:14px 18px;background:var(--bg);border:1px solid var(--edge);border-radius:6px;border-left:3px solid var(--cyan)}
+.preview-meta{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:1px;color:var(--gray2);text-transform:uppercase;margin-bottom:8px}
+.preview-title{font-size:14px;font-weight:500;color:var(--white);margin-bottom:6px}
+.preview-summary{font-size:13px;color:var(--gray1)}
+
+.list{margin-top:30px}
+.list h2{font-size:16px;font-weight:500;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--edge)}
+.item{background:var(--bg2);border:1px solid var(--edge);border-radius:6px;padding:12px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.item-content{flex:1;min-width:0}
+.item-meta{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:1px;color:var(--gray2);text-transform:uppercase;margin-bottom:4px}
+.item-title{font-size:13px;font-weight:500;color:var(--white);margin-bottom:4px}
+.item-summary{font-size:12px;color:var(--gray1)}
+
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="head">
+    <div>
+      <h1>News Admin</h1>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <span class="head-tag">Restricted</span>
+      <div class="head-links">
+        <a href="/news" target="_blank">View public page ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="token-bar">
+    <label>Admin token</label>
+    <input id="token" type="password" placeholder="Paste your admin token here" autocomplete="off">
+    <span class="token-status" id="token-status">NOT SET</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="ai">AI mode</button>
+    <button class="tab-btn" data-mode="manual">Manual mode</button>
+  </div>
+
+  <!-- AI mode -->
+  <div id="mode-ai" class="panel">
+    <h2>AI-summarized news</h2>
+    <p class="panel-sub">Paste the tweet URL or full text. The AI will generate a clean title, summary, and category. Review before publishing.</p>
+
+    <div class="row">
+      <label>Source handle (optional)</label>
+      <input id="ai-handle" placeholder="StellarOrg" autocomplete="off">
+      <div class="row-hint">Twitter handle without @, e.g. "StellarOrg" or "Soroswap"</div>
+    </div>
+
+    <div class="row">
+      <label>Source URL (optional)</label>
+      <input id="ai-url" placeholder="https://x.com/StellarOrg/status/..." autocomplete="off">
+    </div>
+
+    <div class="row">
+      <label>Tweet content / news content</label>
+      <textarea id="ai-content" placeholder="Paste the full tweet text or news content here..."></textarea>
+      <div class="row-hint">Anything you paste here will be sent to Claude for summarization.</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="ai-generate">Generate summary</button>
+      <button class="btn btn-secondary" id="ai-clear">Clear</button>
+    </div>
+
+    <div id="ai-feedback"></div>
+    <div id="ai-preview" class="hidden"></div>
+  </div>
+
+  <!-- Manual mode -->
+  <div id="mode-manual" class="panel hidden">
+    <h2>Manual publish</h2>
+    <p class="panel-sub">Write the title and summary yourself. No AI involved.</p>
+
+    <div class="row">
+      <label>Title</label>
+      <input id="m-title" placeholder="Stellar Protocol 22 mainnet upgrade scheduled for May 14" autocomplete="off">
+    </div>
+
+    <div class="row">
+      <label>Summary (2-3 sentences)</label>
+      <textarea id="m-summary" placeholder="What happened and why it matters..."></textarea>
+    </div>
+
+    <div class="row-grid">
+      <div class="row">
+        <label>Category</label>
+        <select id="m-category">
+          <option value="general">General</option>
+          <option value="protocol">Protocol</option>
+          <option value="defi">DeFi</option>
+          <option value="rwa">RWA</option>
+          <option value="funding">Funding</option>
+          <option value="partnerships">Partnerships</option>
+        </select>
+      </div>
+      <div class="row">
+        <label>Source handle</label>
+        <input id="m-handle" placeholder="StellarOrg" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="row-grid">
+      <div class="row">
+        <label>Source URL</label>
+        <input id="m-url" placeholder="https://x.com/..." autocomplete="off">
+      </div>
+      <div class="row">
+        <label>Project name (optional)</label>
+        <input id="m-project" placeholder="Soroswap" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="m-publish">Publish</button>
+      <button class="btn btn-secondary" id="m-clear">Clear</button>
+    </div>
+
+    <div id="m-feedback"></div>
+  </div>
+
+  <!-- Recent news list -->
+  <div class="list">
+    <h2>Recent news (last 20)</h2>
+    <div id="recent-list"></div>
+  </div>
+
+</div>
+
+<script>
+const API = 'https://api.stellarmonitor.xyz';
+
+// Token persistence
+const tokenInput = document.getElementById('token');
+const tokenStatus = document.getElementById('token-status');
+tokenInput.value = localStorage.getItem('sm_admin_token') || '';
+function updateTokenStatus() {
+  const v = tokenInput.value.trim();
+  if (v.length < 16) {
+    tokenStatus.textContent = 'NOT SET';
+    tokenStatus.className = 'token-status bad';
+  } else {
+    tokenStatus.textContent = 'LOADED';
+    tokenStatus.className = 'token-status ok';
+  }
+}
+updateTokenStatus();
+tokenInput.addEventListener('input', () => {
+  localStorage.setItem('sm_admin_token', tokenInput.value.trim());
+  updateTokenStatus();
+});
+
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    const mode = b.dataset.mode;
+    document.getElementById('mode-ai').classList.toggle('hidden', mode !== 'ai');
+    document.getElementById('mode-manual').classList.toggle('hidden', mode !== 'manual');
+  });
+});
+
+function showAlert(containerId, msg, type) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = `<div class="alert ${type}">${msg}</div>`;
+  if (type === 'ok') setTimeout(() => { c.innerHTML = ''; }, 4000);
+}
+
+function getToken() {
+  const t = tokenInput.value.trim();
+  if (!t) {
+    alert('Set the admin token first.');
+    return null;
+  }
+  return t;
+}
+
+// AI mode
+let aiResult = null;
+document.getElementById('ai-generate').addEventListener('click', async () => {
+  const token = getToken(); if (!token) return;
+  const content = document.getElementById('ai-content').value.trim();
+  if (!content) {
+    showAlert('ai-feedback', 'Paste tweet content first', 'err');
+    return;
+  }
+  const handle = document.getElementById('ai-handle').value.trim();
+  const btn = document.getElementById('ai-generate');
+  btn.disabled = true; btn.textContent = 'Generating...';
+  showAlert('ai-feedback', 'Asking Claude…', 'info');
+  try {
+    const r = await fetch(API + '/api/news/admin/ai-summarize', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'X-Admin-Token': token},
+      body: JSON.stringify({ content, source_handle: handle || null })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || 'AI request failed');
+    aiResult = d;
+    document.getElementById('ai-feedback').innerHTML = '';
+    const preview = document.getElementById('ai-preview');
+    preview.classList.remove('hidden');
+    preview.innerHTML = `
+      <div class="preview">
+        <div class="preview-meta">${d.category || 'general'} · preview</div>
+        <div class="preview-title">${d.title}</div>
+        <div class="preview-summary">${d.summary}</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn" id="ai-publish">Publish this</button>
+        <button class="btn btn-secondary" id="ai-regen">Regenerate</button>
+      </div>
+      <div id="ai-publish-feedback"></div>
+    `;
+    document.getElementById('ai-publish').addEventListener('click', publishAI);
+    document.getElementById('ai-regen').addEventListener('click', () => {
+      preview.classList.add('hidden');
+      document.getElementById('ai-generate').click();
+    });
+  } catch(e) {
+    showAlert('ai-feedback', 'Error: ' + e.message, 'err');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Generate summary';
+  }
+});
+
+async function publishAI() {
+  if (!aiResult) return;
+  const token = getToken(); if (!token) return;
+  const url = document.getElementById('ai-url').value.trim();
+  const handle = document.getElementById('ai-handle').value.trim();
+  const content = document.getElementById('ai-content').value.trim();
+  try {
+    const r = await fetch(API + '/api/news/admin/add', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'X-Admin-Token': token},
+      body: JSON.stringify({
+        title: aiResult.title,
+        summary: aiResult.summary,
+        category: aiResult.category || 'general',
+        source_handle: handle || null,
+        source_url: url || null,
+        raw_content: content
+      })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || 'Publish failed');
+    showAlert('ai-publish-feedback', `Published with ID ${d.id}`, 'ok');
+    document.getElementById('ai-content').value = '';
+    document.getElementById('ai-url').value = '';
+    document.getElementById('ai-preview').classList.add('hidden');
+    aiResult = null;
+    loadRecent();
+  } catch(e) {
+    showAlert('ai-publish-feedback', 'Error: ' + e.message, 'err');
+  }
+}
+
+document.getElementById('ai-clear').addEventListener('click', () => {
+  document.getElementById('ai-content').value = '';
+  document.getElementById('ai-handle').value = '';
+  document.getElementById('ai-url').value = '';
+  document.getElementById('ai-preview').classList.add('hidden');
+  document.getElementById('ai-feedback').innerHTML = '';
+});
+
+// Manual mode
+document.getElementById('m-publish').addEventListener('click', async () => {
+  const token = getToken(); if (!token) return;
+  const title = document.getElementById('m-title').value.trim();
+  const summary = document.getElementById('m-summary').value.trim();
+  if (!title || !summary) {
+    showAlert('m-feedback', 'Title and summary are required', 'err');
+    return;
+  }
+  try {
+    const r = await fetch(API + '/api/news/admin/add', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'X-Admin-Token': token},
+      body: JSON.stringify({
+        title,
+        summary,
+        category: document.getElementById('m-category').value,
+        source_handle: document.getElementById('m-handle').value.trim() || null,
+        source_url: document.getElementById('m-url').value.trim() || null,
+        project_name: document.getElementById('m-project').value.trim() || null
+      })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || 'Publish failed');
+    showAlert('m-feedback', `Published with ID ${d.id}`, 'ok');
+    document.getElementById('m-title').value = '';
+    document.getElementById('m-summary').value = '';
+    document.getElementById('m-handle').value = '';
+    document.getElementById('m-url').value = '';
+    document.getElementById('m-project').value = '';
+    loadRecent();
+  } catch(e) {
+    showAlert('m-feedback', 'Error: ' + e.message, 'err');
+  }
+});
+
+document.getElementById('m-clear').addEventListener('click', () => {
+  ['m-title','m-summary','m-handle','m-url','m-project'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('m-feedback').innerHTML = '';
+});
+
+// Recent list with delete
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function loadRecent() {
+  const list = document.getElementById('recent-list');
+  list.innerHTML = '<div style="color:var(--gray2);font-size:12px;padding:10px">Loading…</div>';
+  try {
+    const r = await fetch(API + '/api/news?limit=20');
+    const d = await r.json();
+    if (!d.news || d.news.length === 0) {
+      list.innerHTML = '<div style="color:var(--gray2);font-size:12px;padding:10px">No news yet</div>';
+      return;
+    }
+    list.innerHTML = d.news.map(n => `
+      <div class="item">
+        <div class="item-content">
+          <div class="item-meta">${escapeHtml((n.category||'general').toUpperCase())} · ${escapeHtml(n.source_handle ? '@'+n.source_handle : 'no source')} · ${escapeHtml(n.published_at||'')}</div>
+          <div class="item-title">${escapeHtml(n.title)}</div>
+          <div class="item-summary">${escapeHtml(n.summary)}</div>
+        </div>
+        <button class="btn btn-danger" data-del="${n.id}">Delete</button>
+      </div>
+    `).join('');
+    list.querySelectorAll('[data-del]').forEach(b => {
+      b.addEventListener('click', async () => {
+        const token = getToken(); if (!token) return;
+        if (!confirm('Delete news item #' + b.dataset.del + '?')) return;
+        const r = await fetch(API + '/api/news/admin/' + b.dataset.del, {
+          method: 'DELETE',
+          headers: {'X-Admin-Token': token}
+        });
+        if (r.ok) loadRecent();
+        else alert('Delete failed');
+      });
+    });
+  } catch(e) {
+    list.innerHTML = '<div class="alert err">Could not load: ' + escapeHtml(e.message) + '</div>';
+  }
+}
+loadRecent();
+</script>
+
+</body>
+</html>

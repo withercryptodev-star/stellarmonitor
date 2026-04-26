@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>News — StellarMonitor</title>
+<meta name="description" content="Curated Stellar ecosystem news. Real-time intelligence from verified projects and official channels.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0NSIgZmlsbD0iIzAwYzhmZiIvPjx0ZXh0IHg9IjUwIiB5PSI2NSIgZm9udC1mYW1pbHk9IkRNIE1vbm8sbW9ub3NwYWNlIiBmb250LXNpemU9IjUwIiBmb250LXdlaWdodD0iNzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDUwYTEyIj5TPC90ZXh0Pjwvc3ZnPg==">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05080d;--bg2:#0c1220;--panel:#0c1220;--edge:#1a2840;
+  --cyan:#00c8ff;--green:#00e87a;--purple:#a78bfa;--amber:#fbbf24;--red:#ff3d5a;
+  --white:#f0f4fa;--gray1:#8da0b8;--gray2:#4a6380;--gray3:#3d5268;--gray4:#2a3d52;
+}
+body{background:var(--bg);color:var(--white);font-family:'Outfit',system-ui,sans-serif;font-size:14px;line-height:1.5;min-height:100vh}
+a{color:var(--cyan);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* Nav */
+.nav{position:sticky;top:0;z-index:50;background:rgba(5,8,13,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--edge)}
+.nav-inner{max-width:1280px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{width:24px;height:24px;border-radius:50%;border:2px solid var(--cyan);display:flex;align-items:center;justify-content:center}
+.brand-mark::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--cyan)}
+.brand-text{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--gray2)}
+.brand-text span{color:var(--cyan)}
+.nav-links{display:flex;gap:22px;font-size:13px}
+.nav-links a{color:var(--gray1)}
+.nav-links a.active{color:var(--cyan)}
+.nav-domain{font-family:'DM Mono',monospace;font-size:11px;color:var(--gray3)}
+
+/* Header */
+.head{max-width:1280px;margin:0 auto;padding:32px 24px 14px}
+.head h1{font-size:32px;font-weight:500;color:var(--white);display:inline-block;margin-right:14px}
+.head-tag{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--gray3);text-transform:uppercase;display:inline}
+.head-sub{font-size:13px;color:var(--gray1);margin-top:8px;max-width:640px}
+
+/* Tabs */
+.tabs{max-width:1280px;margin:18px auto 0;padding:0 24px;display:flex;gap:8px;border-bottom:1px solid var(--edge)}
+.tab{padding:10px 16px;font-size:13px;color:var(--gray1);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab:first-child{padding-left:0}
+.tab:hover{color:var(--white)}
+.tab.active{color:var(--white);border-bottom-color:var(--cyan);font-weight:500}
+.tab-count{color:var(--gray2);margin-left:6px;font-size:11px;font-family:'DM Mono',monospace}
+
+/* Filters */
+.filters{max-width:1280px;margin:0 auto;padding:18px 24px;display:flex;gap:12px;align-items:center;border-bottom:1px solid var(--edge);flex-wrap:wrap}
+.search{flex:1;min-width:260px;display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--edge);border-radius:6px;padding:10px 14px;transition:border-color .15s}
+.search:focus-within{border-color:var(--cyan)}
+.search svg{width:14px;height:14px;color:var(--gray2);flex-shrink:0}
+.search input{background:none;border:none;outline:none;color:var(--white);font-size:13px;width:100%;font-family:inherit}
+.search input::placeholder{color:var(--gray2)}
+.cats{display:flex;gap:6px;flex-wrap:wrap}
+.cat{padding:6px 12px;border:1px solid var(--edge);color:var(--gray1);border-radius:3px;font-size:11px;font-family:'DM Mono',monospace;letter-spacing:1px;cursor:pointer;background:none;transition:all .15s}
+.cat:hover{color:var(--white);border-color:var(--gray2)}
+.cat.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,200,255,.08)}
+
+/* Feed */
+.feed{max-width:1280px;margin:0 auto;padding:20px 24px 60px;display:flex;flex-direction:column;gap:12px}
+.empty{text-align:center;padding:60px 20px;color:var(--gray2)}
+.empty-title{font-size:16px;color:var(--gray1);margin-bottom:6px}
+.empty-sub{font-size:13px}
+
+.card{background:var(--panel);border:1px solid var(--edge);border-radius:6px;padding:16px 20px;transition:border-color .15s}
+.card:hover{border-color:rgba(0,200,255,.25)}
+.card.featured{border-left:3px solid var(--cyan)}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:12px;flex-wrap:wrap}
+.card-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cat-tag{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:1.2px;padding:2px 7px;border-radius:2px;text-transform:uppercase}
+.cat-tag.protocol{border:1px solid rgba(0,232,122,.3);background:rgba(0,232,122,.1);color:var(--green)}
+.cat-tag.defi{border:1px solid rgba(167,139,250,.3);background:rgba(167,139,250,.1);color:var(--purple)}
+.cat-tag.rwa{border:1px solid rgba(0,200,255,.3);background:rgba(0,200,255,.1);color:var(--cyan)}
+.cat-tag.funding{border:1px solid rgba(251,191,36,.3);background:rgba(251,191,36,.1);color:var(--amber)}
+.cat-tag.partnerships{border:1px solid rgba(167,139,250,.3);background:rgba(167,139,250,.1);color:var(--purple)}
+.cat-tag.general{border:1px solid var(--edge);background:rgba(141,160,184,.08);color:var(--gray1)}
+.card-source{font-size:13px;font-weight:500;color:var(--cyan)}
+.card-time{font-size:11px;color:var(--gray3);font-family:'DM Mono',monospace;text-transform:uppercase}
+.card-utc{font-size:10px;color:var(--gray3);font-family:'DM Mono',monospace}
+.card-title{font-size:15px;font-weight:500;color:var(--white);margin-bottom:6px;line-height:1.4}
+.card-summary{font-size:13px;color:var(--gray1);line-height:1.6}
+.card-foot{margin-top:10px;display:flex;gap:14px;font-size:11px;color:var(--gray2);font-family:'DM Mono',monospace;flex-wrap:wrap}
+.card-foot a{color:var(--gray2)}
+.card-foot a:hover{color:var(--cyan)}
+
+/* Footer */
+.foot{max-width:1280px;margin:0 auto;padding:30px 24px;border-top:1px solid var(--edge);display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--gray3);font-family:'DM Mono',monospace;letter-spacing:1px}
+.foot a{color:var(--gray2)}
+.foot-links{display:flex;gap:18px}
+
+@media (max-width:680px){
+  .nav-links{display:none}
+  .head h1{font-size:26px}
+  .filters{flex-direction:column;align-items:stretch}
+  .cats{justify-content:flex-start}
+  .foot{flex-direction:column;gap:10px;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">STELLAR <span>MONITOR</span></div>
+    </div>
+    <div class="nav-links">
+      <a href="/">Feed</a>
+      <a href="/scanner">Scanner</a>
+      <a href="/ecosystem">Ecosystem</a>
+      <a href="/news" class="active">News</a>
+      <a href="/intelligence">Intelligence</a>
+      <a href="/docs">Docs</a>
+    </div>
+    <div class="nav-domain">stellarmonitor.xyz</div>
+  </div>
+</nav>
+
+<header class="head">
+  <h1>News</h1>
+  <span class="head-tag">Curated Stellar ecosystem signal</span>
+  <p class="head-sub">Real-time aggregated news from verified Stellar projects and official channels. Manually curated, AI-summarized.</p>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-period="today">Today <span class="tab-count" id="cnt-today">0</span></div>
+  <div class="tab" data-period="week">This week <span class="tab-count" id="cnt-week">0</span></div>
+  <div class="tab" data-period="all">All <span class="tab-count" id="cnt-total">0</span></div>
+</div>
+
+<div class="filters">
+  <div class="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input id="search" placeholder="Search by project name, source, or keyword…" autocomplete="off">
+  </div>
+  <div class="cats">
+    <button class="cat active" data-cat="all">ALL</button>
+    <button class="cat" data-cat="protocol">PROTOCOL</button>
+    <button class="cat" data-cat="defi">DEFI</button>
+    <button class="cat" data-cat="rwa">RWA</button>
+    <button class="cat" data-cat="funding">FUNDING</button>
+    <button class="cat" data-cat="partnerships">PARTNERSHIPS</button>
+    <button class="cat" data-cat="general">GENERAL</button>
+  </div>
+</div>
+
+<main class="feed" id="feed">
+  <div class="empty">
+    <div class="empty-title">Loading…</div>
+  </div>
+</main>
+
+<footer class="foot">
+  <span>© 2026 STELLARMONITOR</span>
+  <div class="foot-links">
+    <a href="/docs">Docs</a>
+    <a href="/ecosystem">Ecosystem</a>
+    <a href="https://x.com/StellarMonitor" target="_blank">Twitter</a>
+  </div>
+</footer>
+
+<script>
+const API = 'https://api.stellarmonitor.xyz';
+let state = { period: 'today', category: 'all', search: '' };
+let searchTimer = null;
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function safeUrl(u) {
+  if (!u) return '#';
+  try {
+    const url = new URL(u);
+    if (!['http:','https:'].includes(url.protocol)) return '#';
+    return url.toString();
+  } catch { return '#'; }
+}
+
+function timeAgo(iso) {
+  if (!iso) return '';
+  const d = new Date(iso.replace(' ', 'T') + 'Z');
+  const diff = (Date.now() - d.getTime()) / 1000;
+  if (diff < 60) return 'JUST NOW';
+  if (diff < 3600) return Math.floor(diff/60) + 'M AGO';
+  if (diff < 86400) return Math.floor(diff/3600) + 'H AGO';
+  if (diff < 604800) return Math.floor(diff/86400) + 'D AGO';
+  return d.toLocaleDateString('en-US', {month:'short', day:'numeric'}).toUpperCase();
+}
+
+function utcTime(iso) {
+  if (!iso) return '';
+  const d = new Date(iso.replace(' ', 'T') + 'Z');
+  return d.toISOString().slice(11,16) + ' UTC';
+}
+
+function renderCard(n, isFirst) {
+  const cat = (n.category || 'general').toLowerCase();
+  const handle = n.source_handle ? '@' + n.source_handle.replace(/^@/, '') : '';
+  const url = safeUrl(n.source_url);
+  const projTag = n.project_name ? `<span>· ${escapeHtml(n.project_name)}</span>` : '';
+  return `
+  <article class="card${isFirst ? ' featured' : ''}">
+    <div class="card-head">
+      <div class="card-meta">
+        <span class="cat-tag ${escapeHtml(cat)}">${escapeHtml(cat)}</span>
+        ${handle ? `<span class="card-source">${escapeHtml(handle)}</span>` : ''}
+        <span class="card-time">${timeAgo(n.published_at)}</span>
+      </div>
+      <span class="card-utc">${utcTime(n.published_at)}</span>
+    </div>
+    <h3 class="card-title">${escapeHtml(n.title)}</h3>
+    <p class="card-summary">${escapeHtml(n.summary)}</p>
+    <div class="card-foot">
+      ${url !== '#' ? `<a href="${url}" target="_blank" rel="noopener">↗ View source</a>` : ''}
+      ${projTag}
+    </div>
+  </article>`;
+}
+
+async function loadCounts() {
+  try {
+    const r = await fetch(API + '/api/news/counts');
+    const d = await r.json();
+    document.getElementById('cnt-today').textContent = d.today || 0;
+    document.getElementById('cnt-week').textContent  = d.week  || 0;
+    document.getElementById('cnt-total').textContent = d.total || 0;
+  } catch(e) { console.error(e); }
+}
+
+async function loadFeed() {
+  const feed = document.getElementById('feed');
+  feed.innerHTML = '<div class="empty"><div class="empty-title">Loading…</div></div>';
+  const params = new URLSearchParams();
+  params.set('limit', '50');
+  params.set('period', state.period);
+  if (state.category && state.category !== 'all') params.set('category', state.category);
+  if (state.search) params.set('search', state.search);
+  try {
+    const r = await fetch(API + '/api/news?' + params);
+    const d = await r.json();
+    if (!d.news || d.news.length === 0) {
+      feed.innerHTML = `<div class="empty"><div class="empty-title">No news yet</div><div class="empty-sub">Check back soon — we are curating Stellar ecosystem updates.</div></div>`;
+      return;
+    }
+    feed.innerHTML = d.news.map((n, i) => renderCard(n, i === 0)).join('');
+  } catch(e) {
+    feed.innerHTML = `<div class="empty"><div class="empty-title">Could not load news</div><div class="empty-sub">${escapeHtml(e.message || 'Network error')}</div></div>`;
+  }
+}
+
+// Tab switching
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    state.period = t.dataset.period;
+    loadFeed();
+  });
+});
+
+// Category switching
+document.querySelectorAll('.cat').forEach(c => {
+  c.addEventListener('click', () => {
+    document.querySelectorAll('.cat').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+    state.category = c.dataset.cat;
+    loadFeed();
+  });
+});
+
+// Search with debounce
+document.getElementById('search').addEventListener('input', e => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    state.search = e.target.value.trim();
+    loadFeed();
+  }, 300);
+});
+
+loadCounts();
+loadFeed();
+setInterval(loadCounts, 60000);
+</script>
+
+</body>
+</html>

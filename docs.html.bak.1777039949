@@ -192,18 +192,6 @@ tr:last-child td{border-bottom:none}
   .sidebar{display:none}
   .content{padding:32px 20px}
 }
-
-/* Roadmap */
-.roadmap-grid{display:flex;flex-direction:column;gap:16px;margin-top:20px}
-.roadmap-item{display:flex;gap:20px;background:var(--panel);border:1px solid var(--edge);border-radius:8px;padding:20px 22px;transition:border-color .15s}
-.roadmap-item:hover{border-color:rgba(0,200,255,.25)}
-.roadmap-num{font-family:'DM Mono',monospace;font-size:28px;font-weight:500;color:var(--cyan);opacity:.7;flex-shrink:0;line-height:1;margin-top:2px}
-.roadmap-content{flex:1}
-.roadmap-title{font-size:16px;font-weight:700;color:var(--white);margin-bottom:6px;font-family:'Outfit',sans-serif}
-.roadmap-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border-radius:2px;background:rgba(0,232,122,.12);color:var(--green);border:1px solid rgba(0,232,122,.3);margin-bottom:10px}
-.roadmap-tag.tag-planned{background:rgba(167,139,250,.1);color:#a78bfa;border-color:rgba(167,139,250,.3)}
-.roadmap-desc{font-size:13px;color:var(--gray1);line-height:1.6}
-
 </style>
 </head>
 <body>
@@ -215,7 +203,7 @@ tr:last-child td{border-bottom:none}
     <a href="/scanner" class="nav-link">Scanner</a>
     <a href="/graph"   class="nav-link">Graph</a>
     <a href="/pools"   class="nav-link">Pools</a>
-    <a href="/news"        class="nav-link">News</a>
+    <a href="/soroban"        class="nav-link">Soroban</a>
     <a href="/ecosystem" class="nav-link">Ecosystem</a>
     <a href="/docs"    class="nav-link active">Docs</a>
   </div>
@@ -229,7 +217,6 @@ tr:last-child td{border-bottom:none}
   <div class="sb-group">
     <span class="sb-head">Overview</span>
     <a href="#intro"        class="sb-link active">Introduction</a>
-    <a href="#roadmap"      class="sb-link">Roadmap</a>
     <a href="#architecture" class="sb-link">Architecture</a>
     <a href="#data-sources" class="sb-link">Data Sources</a>
   </div>
@@ -251,10 +238,6 @@ tr:last-child td{border-bottom:none}
     <a href="#api-pairs"    class="sb-link">GET /api/pairs</a>
   </div>
   <div class="sb-group">
-    <span class="sb-head">Contribute</span>
-    <a href="#brand-kit"    class="sb-link">Brand Kit</a>
-  </div>
-  <div class="sb-group">
     <span class="sb-head">Legal</span>
     <a href="#disclaimer" class="sb-link">Disclaimer</a>
     <a href="#privacy"    class="sb-link">Privacy Policy</a>
@@ -271,26 +254,6 @@ tr:last-child td{border-bottom:none}
   <p>StellarMonitor is a real-time on-chain intelligence platform for the Stellar Network. It monitors whale transfers, large SDEX trades, Soroban smart contract events, and anomalous token distribution patterns — delivering instant alerts via Twitter, Telegram, and this web dashboard.</p>
   <p>All data is sourced directly from public blockchain infrastructure. StellarMonitor does not store private keys, personal data, or any information that could identify individual users.</p>
   <div class="note"><p><strong style="color:var(--white)">Open Source.</strong> Published under the MIT License at <a href="https://github.com/withercryptodev-star/stellarmonitor" target="_blank">github.com/withercryptodev-star/stellarmonitor</a></p></div>
-</div>
-
-
-<div class="doc-section" id="roadmap">
-  <h2 class="doc-h2">Roadmap</h2>
-  <p>The milestones we are working toward. Items are ordered by priority, not fixed dates — we ship when the work is ready. Full version with deliverables and rationale lives on <a href="https://github.com/withercryptodev-star/stellarmonitor/blob/main/ROADMAP.md" target="_blank">GitHub</a>.</p>
-
-  <div class="roadmap-grid">
-    <div class="roadmap-item"><div class="roadmap-num">01</div><div class="roadmap-content"><div class="roadmap-title">News Hub</div><div class="roadmap-tag">In Focus</div><p class="roadmap-desc">Replace the Soroban page with a curated News section — Stellar ecosystem news, protocol updates, partnership announcements, and developer activity. Home for our weekly newsletter "Stellar Pulse" and quarterly research reports.</p></div></div>
-    <div class="roadmap-item"><div class="roadmap-num">02</div><div class="roadmap-content"><div class="roadmap-title">Stellar AI Integration</div><div class="roadmap-tag tag-planned">Planned</div><p class="roadmap-desc">Natural language queries over on-chain data, AI-generated wallet summaries, automated anomaly detection with narrative context. A chat layer that makes Stellar activity accessible via site and Telegram.</p></div></div>
-    <div class="roadmap-item"><div class="roadmap-num">03</div><div class="roadmap-content"><div class="roadmap-title">Token Analytics</div><div class="roadmap-tag tag-planned">Planned</div><p class="roadmap-desc">Deep-dive pages for individual Stellar assets — holders, distribution, liquidity across SDEX and Soroban AMMs, DEX pairs, historical activity, transfer and trade history.</p></div></div>
-    <div class="roadmap-item"><div class="roadmap-num">04</div><div class="roadmap-content"><div class="roadmap-title">Smart Money Tracking</div><div class="roadmap-tag tag-planned">Planned</div><p class="roadmap-desc">Follow top traders, LPs and early movers on Stellar. Curated Smart Money list, live feed of their transactions, copy-trade signals, historical performance and leaderboards by category.</p></div></div>
-    <div class="roadmap-item"><div class="roadmap-num">05</div><div class="roadmap-content"><div class="roadmap-title">Portfolio Tracker</div><div class="roadmap-tag tag-planned">Planned</div><p class="roadmap-desc">Connect a wallet — see full P&amp;L, every DeFi position, every trade, every asset across Stellar. Real-time tracking across Blend, Aquarius, Soroswap, FxDAO, DeFindex with CSV export for tax reporting.</p></div></div>
-    <div class="roadmap-item"><div class="roadmap-num">06</div><div class="roadmap-content"><div class="roadmap-title">Wallet Intelligence v2 + Alerts Bot v2</div><div class="roadmap-tag tag-planned">Planned</div><p class="roadmap-desc">Public watchlists — follow any Stellar wallet, get notified on moves. Custom alert thresholds via Telegram. Community-contributed address tags. Webhook support for power users.</p></div></div>
-    <div class="roadmap-item"><div class="roadmap-num">07</div><div class="roadmap-content"><div class="roadmap-title">Collaborations with Ecosystem Projects</div><div class="roadmap-tag tag-planned">Planned</div><p class="roadmap-desc">Structured partnerships with Stellar projects — data integrations, co-marketing campaigns, shared dashboards, embeddable widgets on partner sites, joint AMAs and featured partner slots on the Ecosystem page.</p></div></div>
-    <div class="roadmap-item"><div class="roadmap-num">08</div><div class="roadmap-content"><div class="roadmap-title">Global Security Audit</div><div class="roadmap-tag tag-planned">Planned</div><p class="roadmap-desc">Independent third-party audit of backend, API, data pipelines and user-facing surfaces. Penetration testing, dependency review, public security disclosure policy, bug bounty program and published audit report.</p></div></div>
-    <div class="roadmap-item"><div class="roadmap-num">09</div><div class="roadmap-content"><div class="roadmap-title">Potential Site &amp; Design Refresh</div><div class="roadmap-tag tag-planned">Possible</div><p class="roadmap-desc">If the product grows into what we think it can, the site will eventually need a full visual refresh. Not a priority on its own — happens only when scope genuinely outgrows the current design. Not happening soon, but on the horizon.</p></div></div>
-  </div>
-
-  <div class="note" style="margin-top:24px"><p><strong style="color:var(--white)">Have an idea?</strong> Open an issue on <a href="https://github.com/withercryptodev-star/stellarmonitor/issues" target="_blank">GitHub</a> or reply to our pinned tweet. The roadmap is not fixed — we ship what moves the project forward fastest.</p></div>
 </div>
 
 <div class="doc-section" id="architecture">
@@ -484,70 +447,6 @@ StellarMonitor Bot
     { "pair": "USDC/CETES", "cnt": 8, "vol": 3470000 }
   ]
 }</code></pre>
-</div>
-
-
-<div class="doc-section" id="brand-kit">
-  <h2 class="doc-h2">Brand Kit</h2>
-  <p>Everything you need to represent StellarMonitor in content, partner materials, press coverage, or contributor work.</p>
-
-  <div class="note">
-    <p><strong style="color:var(--white)">Full brand kit on GitHub:</strong> <a href="https://github.com/withercryptodev-star/stellarmonitor/tree/main/brand" target="_blank">github.com/withercryptodev-star/stellarmonitor/tree/main/brand</a></p>
-    <p style="margin-top:8px">Includes logos (SVG + PNG), Twitter and square banners, editable templates, and brand guidelines.</p>
-  </div>
-
-  <h3 class="doc-h3">Quick access</h3>
-  <table>
-    <tr><th>Asset</th><th>Size</th><th>Link</th></tr>
-    <tr><td>Logo mark (SVG)</td><td>Scalable</td><td><a href="/brand/logo/logo_mark.svg" target="_blank">Download</a></td></tr>
-    <tr><td>Logo mark (PNG)</td><td>1024×1024</td><td><a href="/brand/logo/logo_mark_1024.png" target="_blank">Download</a></td></tr>
-    <tr><td>Wordmark</td><td>800×200</td><td><a href="/brand/logo/logo_wordmark_800x200.png" target="_blank">Download</a></td></tr>
-    <tr><td>Twitter post banner</td><td>1200×628</td><td><a href="/brand/banners/twitter_post_1200x628.png" target="_blank">Download</a></td></tr>
-    <tr><td>Twitter header</td><td>1500×500</td><td><a href="/brand/banners/twitter_header_1500x500.png" target="_blank">Download</a></td></tr>
-    <tr><td>Square post</td><td>1080×1080</td><td><a href="/brand/banners/square_1080x1080.png" target="_blank">Download</a></td></tr>
-    <tr><td>Announcement template</td><td>1200×628</td><td><a href="/brand/templates/announcement_1200x628.png" target="_blank">Download</a></td></tr>
-  </table>
-
-  <h3 class="doc-h3">Colors</h3>
-  <table>
-    <tr><th>Role</th><th>Hex</th></tr>
-    <tr><td>Background</td><td><code>#050a12</code></td></tr>
-    <tr><td>Cyan accent</td><td><code>#00c8ff</code></td></tr>
-    <tr><td>Verified green</td><td><code>#00e87a</code></td></tr>
-    <tr><td>Purple</td><td><code>#a78bfa</code></td></tr>
-    <tr><td>Amber</td><td><code>#fbbf24</code></td></tr>
-    <tr><td>Red</td><td><code>#ff3d5a</code></td></tr>
-    <tr><td>Primary text</td><td><code>#f0f4fa</code></td></tr>
-    <tr><td>Secondary text</td><td><code>#8da0b8</code></td></tr>
-  </table>
-
-  <h3 class="doc-h3">Typography</h3>
-  <ul>
-    <li><strong style="color:var(--white)">Outfit</strong> — headlines and UI, weights 400/600/700/800</li>
-    <li><strong style="color:var(--white)">DM Mono</strong> — labels, metrics, code, weights 400/500</li>
-  </ul>
-  <p>Both free from Google Fonts.</p>
-
-  <h3 class="doc-h3">Logo usage</h3>
-  <ul>
-    <li>Always cyan on dark background — no inversions</li>
-    <li>Minimum clear space equals the diameter of the inner dot</li>
-    <li>Do not recolor, rotate, stretch, or add effects</li>
-  </ul>
-
-  <h3 class="doc-h3">Voice</h3>
-  <p>Direct. Factual. No hype. Numbers over adjectives. Short sentences over long ones.</p>
-
-  <h3 class="doc-h3">Taglines</h3>
-  <ul>
-    <li>Primary: <em style="color:var(--cyan)">On-chain. Real-time.</em></li>
-    <li>Secondary: Stellar network intelligence</li>
-  </ul>
-
-  <h3 class="doc-h3">Mentions and hashtags</h3>
-  <p>Handle: <code>@StellarMonitor</code></p>
-  <p>Partners: <code>@StellarOrg</code>, <code>@BuildOnStellar</code></p>
-  <p>Hashtags: <code>#Stellar</code>, <code>#XLM</code>, <code>#Soroban</code>, <code>#StellarEcosystem</code>, <code>#BuildOnStellar</code></p>
 </div>
 
 <div class="doc-section" id="disclaimer">
