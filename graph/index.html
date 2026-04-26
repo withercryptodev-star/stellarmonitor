@@ -25,15 +25,15 @@ nav{
   background:rgba(5,8,13,0.92);backdrop-filter:blur(20px);
   border-bottom:1px solid var(--edge);
 }
-.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--white);font-weight:700;font-size:14px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--white);font-weight:700;font-size:14px}
 .logo-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 8px var(--cyan)}50%{opacity:.5;box-shadow:0 0 3px var(--cyan)}}
 .nav-center{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:1px;white-space:nowrap}
-.gnav-link{z-index:200;position:relative;font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#8da0b8;text-decoration:none;padding:7px 16px;border-radius:3px;transition:all .15s;border:1px solid transparent}
-.gnav-link:hover{color:#f0f4fa;background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.07)}
-.gnav-active{color:#00c8ff !important;border-color:rgba(0,200,255,.3) !important;background:rgba(0,200,255,.06) !important}
-.gnav-cta{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:7px 18px;border:1px solid #00c8ff;color:#00c8ff;border-radius:3px;text-decoration:none;transition:all .15s}
-.gnav-cta:hover{background:#00c8ff;color:#05080d}
+.nav-link{z-index:200;position:relative;font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#8da0b8;text-decoration:none;padding:7px 16px;border-radius:3px;transition:all .15s;border:1px solid transparent}
+.nav-link:hover{color:#f0f4fa;background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.07)}
+.active{color:#00c8ff !important;border-color:rgba(0,200,255,.3) !important;background:rgba(0,200,255,.06) !important}
+.nav-cta{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:7px 18px;border:1px solid #00c8ff;color:#00c8ff;border-radius:3px;text-decoration:none;transition:all .15s}
+.nav-cta:hover{background:#00c8ff;color:#05080d}
 
 /* CANVAS */
 #canvas{position:fixed;inset:0;top:52px;cursor:grab}
@@ -208,19 +208,17 @@ nav{
 <body>
 
 <nav>
-  <a href="/" class="nav-logo">
-    <div class="logo-dot"></div>StellarMonitor
-  </a>
+  <a href="/" class="logo"><div class="logo-dot"></div>StellarMonitor</a>
   <div class="nav-center">
-    <a href="/feed"    class="gnav-link">Live Feed</a>
-    <a href="/scanner" class="gnav-link">Scanner</a>
-    <a href="/graph"   class="gnav-link gnav-active">Graph</a>
-    <a href="/pools"   class="gnav-link">Pools</a>
-    <a href="/news"      class="gnav-link">News</a>
-    <a href="/intelligence" class="gnav-link">Intelligence</a>
-    <a href="/docs"    class="gnav-link">Docs</a>
+    <a href="/feed"    class="nav-link">Live Feed</a>
+    <a href="/scanner" class="nav-link">Scanner</a>
+    <a href="/graph"   class="nav-link active">Graph</a>
+    <a href="/pools"   class="nav-link">Pools</a>
+    <a href="/news"      class="nav-link">News</a>
+    <a href="/ecosystem" class="nav-link">Ecosystem</a>
+    <a href="/docs"    class="nav-link">Docs</a>
   </div>
-  <div style="display:flex;gap:8px;flex-shrink:0"><a href="https://t.me/stellarmonitor" class="gnav-cta" style="border-color:rgba(0,200,255,.4);background:rgba(0,200,255,.06)" target="_blank">Telegram ↗</a><a href="https://x.com/StellarMonitor" class="gnav-cta" target="_blank">Follow ↗</a></div>
+  <div style="display:flex;gap:8px;flex-shrink:0"><a href="https://t.me/stellarmonitor" class="nav-cta" style="border-color:rgba(0,200,255,.4);background:rgba(0,200,255,.06)" target="_blank">Telegram ↗</a><a href="https://x.com/StellarMonitor" class="nav-cta" target="_blank">Follow ↗</a></div>
 </nav>
 
 <!-- SEARCH -->
