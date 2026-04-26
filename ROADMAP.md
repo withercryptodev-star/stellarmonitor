@@ -6,9 +6,19 @@ The roadmap lives in two places: here on GitHub as the source of truth, and at [
 
 ---
 
-## Milestone 1 — News Hub
+## Milestone 1 — News Hub *(partially live, in testing)*
 
-Replace the current Soroban page with a curated News section — the most relevant Stellar ecosystem news, protocol updates, partnership announcements, developer activity, and broader blockchain signals. Also the home for our editorial output — a weekly newsletter and quarterly research reports.
+A curated News section is now live at [stellarmonitor.xyz/news](https://stellarmonitor.xyz/news), replacing the previous Soroban page. Manual publishing through an authenticated admin panel works today. AI-summarized publishing, weekly newsletter, and quarterly research reports are in active development.
+
+**Status**
+
+- ✅ News page live at `/news` with category filters, search, and time-based tabs (Today / Week / All)
+- ✅ Admin panel with manual publishing live at `/admin/news/` (basic auth protected)
+- ✅ `/soroban` automatically redirects to `/news`
+- ⏳ AI-summarized publishing endpoint built, awaiting Anthropic API key activation
+- ⏳ Twitter source integration for semi-automated curation
+- ⏳ Weekly newsletter "Stellar Pulse" — content pipeline being designed
+- ⏳ Quarterly research reports — first edition planned for Q3 2026
 
 **Deliverables**
 
